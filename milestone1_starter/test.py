@@ -1,6 +1,6 @@
 from source import Source
 
 
-src = Source(0, 'testfiles/columns.png')
+src = Source(0, 'testfiles/A.txt')
 
-src_payload, databits = src.process() 
+src_payload, src_databits = src.process()

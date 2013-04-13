@@ -15,6 +15,8 @@ class Source:
         self.fname = filename
         print 'Source: '
 
+    
+    
     def process(self):
         # Form the databits, from the filename 
         if self.fname is not None:
@@ -27,10 +29,15 @@ class Source:
         else: 
         # test              
             return 0, 0  
-
-        databits = payload
+                
+        #this makes the databits to be the header + payload
+        databits = np.append(header, payload);
+        print databits
         return payload, databits
 
+    
+    
+    
     def text2bits(self, filename):
         f = open(filename, 'r')
         fileStr = f.read()
@@ -41,6 +48,10 @@ class Source:
         bits = np.unpackbits(ascii)
         return bits
 
+    
+    
+    
+    
     def bits_from_image(self, filename):
    
         img = Image.open(filename)
@@ -62,6 +73,10 @@ class Source:
 
         return bits
 
+    
+    
+    
+    
     def get_header(self, payload_length, srctype): 
         # Given the payload length and the type of source 
         # (image, text, monotone), form the header
@@ -81,9 +96,7 @@ class Source:
             headerstr += "00"
 
         headerstr += bin(payload_length)[2:].zfill(32)
-
         header = np.fromstring(headerstr, dtype=np.uint8)
-
         header[:] = [x - 48 for x in header]
         
         return header
