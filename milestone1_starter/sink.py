@@ -26,7 +26,23 @@ class Sink:
         # If its a text, just print out the text
         
         # Return the received payload for comparison purposes
-        return rcd_payload
+        
+        #1. split numpy array inot header and payload
+        #2. get type from header
+        #3. get size of payload from header
+        #4. truncate payload corresponding to size
+        #5. convert the payload array of 1's and 0's to image or text
+        # based on the header info.
+        
+        header = recd_bits[0:11]
+        type, payloadLength = self.read_header(header)
+        
+        
+        print header
+        
+        
+        
+    #return rcd_payload
 
     def bits2text(self, bits):
         # Convert the received payload to text (string)
@@ -40,7 +56,24 @@ class Sink:
     def read_header(self, header_bits): 
         # Given the header bits, compute the payload length
         # and source type (compatible with get_header on source)
- 
+        #this funtion is now working LMP
+        # First get type
+        # then convert the remaining payload size bits to string
+        # convert that string to an int
+        typeBits = header_bits[0:2]
+        payloadLengthInBinary = header_bits[2:34]
+        if typeBits[0] == 1:
+            srctype = "txt"
+        elif typeBits[1] == 1:
+            srctype = "img"
+        else:
+            srctype = "mon"
+    
+        payloadLengthString = ""
+        for bit in payloadLengthInBinary:
+            bitStr = str(bit)
+            payloadLengthString += bitStr
+        payload_length = int(payloadLengthString, 2);
         print '\tRecd header: ', header_bits
         print '\tLength from header: ', payload_length
         print '\tSource type: ', srctype
