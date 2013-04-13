@@ -19,18 +19,19 @@ class Source:
         # Form the databits, from the filename 
         if self.fname is not None:
             if self.fname.endswith('.png') or self.fname.endswith('.PNG'):
-                databits = self.bits_from_image(self.fname)
+                payload = self.bits_from_image(self.fname)
+                header = self.get_header(payload.shape[0], "img")
             else:           
-                databits = self.text2bits(self.fname)          
+                payload = self.text2bits(self.fname) 
+                header = self.get_header(payload.shape[0], "txt")         
         else: 
         # test              
             return 0, 0  
 
-        payload = databits
+        databits = payload
         return payload, databits
 
     def text2bits(self, filename):
-        
         f = open(filename, 'r')
         fileStr = f.read()
 
@@ -38,16 +39,13 @@ class Source:
         ascii = np.array([ord(c) for c in fileStr], dtype=np.uint8)
 
         bits = np.unpackbits(ascii)
-
         return bits
 
     def bits_from_image(self, filename):
    
         img = Image.open(filename)
         # img.mode() must equal "RGB" for this specific code to work
-        img = img.convert("RGB")
 
-        # gives a list of rgb values in the form { (R, G, B) , (R, G, B) , (R, G, B) }
         pixels = list(img.getdata())
 
         pixlist = list([])
@@ -67,4 +65,25 @@ class Source:
     def get_header(self, payload_length, srctype): 
         # Given the payload length and the type of source 
         # (image, text, monotone), form the header
+
+        # monotone 00
+        # image 01
+        # text is 10
+
+        headerstr = ""
+
+        if srctype == "img":
+            headerstr += "01"
+        elif srctype == "txt":
+            headerstr += "10"
+        else:
+            #monotone
+            headerstr += "00"
+
+        headerstr += bin(payload_length)[2:].zfill(32)
+
+        header = np.fromstring(headerstr, dtype=np.uint8)
+
+        header[:] = [x - 48 for x in header]
+        
         return header
