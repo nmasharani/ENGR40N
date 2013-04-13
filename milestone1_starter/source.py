@@ -54,6 +54,8 @@ class Source:
     def bits_from_image(self, filename):
         img = Image.open(filename)
         # img.mode() must equal "RGB" for this specific code to work
+        
+        print img.tostring()
         pixels = list(img.getdata())
         pixlist = list([])
         for t in pixels:

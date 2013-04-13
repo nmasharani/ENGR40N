@@ -2,7 +2,7 @@ from source import Source
 from sink import Sink
 
 
-src = Source(0, "testfiles/A.txt")
+src = Source(0, "testfiles/32pix.png")
 
 src_payload, src_databits = src.process()
 

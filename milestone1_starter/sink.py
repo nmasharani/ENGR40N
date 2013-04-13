@@ -41,7 +41,7 @@ class Sink:
             text = self.bits2text(bits)
             print text
         elif type == "img":
-            self.image_from_bits(bits, "rcd-image.png")
+            self.image_from_bits(bits, "rcd-image.png", payloadLength)
         else:
             print bits #monotone
         
@@ -69,11 +69,17 @@ class Sink:
                 charStr = ""
         return  text
 
-    def image_from_bits(self, bits,filename):
+            
+            
+    def image_from_bits(self, bits,filename, payloadLength):
         # Convert the received payload to an image and save it
         # No return value required .
+        img.open(self.filename)
+        img.fromstring(mode, bits, payloadLength)
         pass 
 
+            
+            
     def read_header(self, header_bits): 
         # Given the header bits, compute the payload length
         # and source type (compatible with get_header on source)
