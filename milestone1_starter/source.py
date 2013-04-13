@@ -24,8 +24,9 @@ class Source:
                 payload = self.bits_from_image(self.fname)
                 header = self.get_header(payload.shape[0], "img")
             else:           
-                payload = self.text2bits(self.fname) 
-                header = self.get_header(payload.shape[0], "txt")         
+                payload = self.text2bits(self.fname)
+                header = self.get_header(payload.shape[0], "txt")
+    
         else:
             #added the functionality to make monotone, tested and works
             payload = np.ones(self.monotone, dtype=np.uint8)

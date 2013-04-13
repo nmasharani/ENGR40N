@@ -34,9 +34,16 @@ class Sink:
         #5. convert the payload array of 1's and 0's to image or text
         # based on the header info.
         
-        header = recd_bits[0:11]
+        header = recd_bits[0:34]
         type, payloadLength = self.read_header(header)
-        
+        bits = recd_bits[34:34 + payloadLength] #truncate based on size
+        if type == "txt":
+            text = self.bits2text(bits)
+            print text
+        elif type == "img":
+            self.image_from_bits(bits, "rcd-image.png")
+        else:
+            print bits #monotone
         
         print header
         
@@ -46,6 +53,20 @@ class Sink:
 
     def bits2text(self, bits):
         # Convert the received payload to text (string)
+        #bits to text impimented, tested, working LMP
+        text = ""
+        count = 0
+        charStr = ""
+        for bit in bits:
+            count = count + 1
+            bitStr = str(bit)
+            charStr += bitStr
+            if count == 8:
+                asciiVal = int(charStr, 2)
+                char = str(unichr(asciiVal));
+                text += char
+                count = 0
+                charStr = ""
         return  text
 
     def image_from_bits(self, bits,filename):
