@@ -73,11 +73,7 @@ class Sink:
             
     def image_from_bits(self, bits,filename, payloadLength):
         # Convert the received payload to an image and save it
-<<<<<<< HEAD
-        # No return value required .
-        #img.open(self.filename)
-        #img.fromstring(mode, bits, payloadLength)
-=======
+        
         # No return value required.
 
         img = Image.new("RGB", (32, 32))
@@ -109,7 +105,6 @@ class Sink:
 
         img.save(filename)
 
->>>>>>> 5907fe9e623ae8e6a3752645d05ff77944ab705d
         pass 
 
             
