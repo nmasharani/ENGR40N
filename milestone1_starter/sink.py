@@ -46,6 +46,8 @@ class Sink:
             print bits #monotone
         
         print header
+
+        return bits
         
         
         
@@ -67,13 +69,14 @@ class Sink:
                 text += char
                 count = 0
                 charStr = ""
+
         return  text
 
             
             
     def image_from_bits(self, bits,filename, payloadLength):
         # Convert the received payload to an image and save it
-        
+
         # No return value required.
 
         img = Image.new("RGB", (32, 32))

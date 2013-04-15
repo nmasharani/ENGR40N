@@ -28,6 +28,6 @@ def hamming(s1,s2):
         if s1[i] != s2[i]:
             hamming_d += 1
     
-    ber = hamming_d / count
+    ber = hamming_d * 1.0 / (count * 1.0)
     
     return hamming_d, ber
