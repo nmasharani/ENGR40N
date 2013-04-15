@@ -47,15 +47,14 @@ class Source:
         bits = np.unpackbits(ascii)
         return bits
 
-    
-    
-    
+
     
     def bits_from_image(self, filename):
         img = Image.open(filename)
-        # img.mode() must equal "RGB" for this specific code to work
+
+        # img.mode() must equal "RGB" for decoding to work
+        img = img.convert("RGB")
         
-        print img.tostring()
         pixels = list(img.getdata())
         pixlist = list([])
         for t in pixels:

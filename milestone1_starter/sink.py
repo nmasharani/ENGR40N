@@ -73,9 +73,43 @@ class Sink:
             
     def image_from_bits(self, bits,filename, payloadLength):
         # Convert the received payload to an image and save it
+<<<<<<< HEAD
         # No return value required .
         #img.open(self.filename)
         #img.fromstring(mode, bits, payloadLength)
+=======
+        # No return value required.
+
+        img = Image.new("RGB", (32, 32))
+
+        # need to get bit string into format [(r, g, b), (r, g, b), (r, g, b)]
+
+        data = list([])
+
+        count = 0
+        intStr = ""
+        rgbList = list([])
+
+        for bit in bits:
+            count += 1
+            bitStr = str(bit)
+            intStr += bitStr
+            if count == 8:
+                val = int(intStr, 2)
+                rgbList.append(val)
+
+                if (len(rgbList) == 3):
+                    data.append(tuple(rgbList))
+                    rgbList = list([])
+
+                count = 0
+                intStr = ""
+
+        img.putdata(data)
+
+        img.save(filename)
+
+>>>>>>> 5907fe9e623ae8e6a3752645d05ff77944ab705d
         pass 
 
             
