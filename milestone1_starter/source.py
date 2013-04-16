@@ -1,3 +1,5 @@
+# Nisha Masharani (nisham) and Luke Pappas (lpappas9)
+
 # audiocom library: Source and sink functions
 import common_srcsink as common
 import Image

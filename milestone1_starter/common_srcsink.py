@@ -1,3 +1,5 @@
+# Nisha Masharani (nisham) and Luke Pappas (lpappas9)
+
 import numpy
 import math
 import operator
