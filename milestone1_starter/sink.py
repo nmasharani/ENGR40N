@@ -79,7 +79,7 @@ class Sink:
 
         # No return value required.
 
-        img = Image.new("RGB", (32, 32))
+        img = Image.new("L", (32, 32))
 
         # need to get bit string into format [(r, g, b), (r, g, b), (r, g, b)]
 
@@ -87,7 +87,12 @@ class Sink:
 
         count = 0
         intStr = ""
-        rgbList = list([])
+
+        # * Use this code to convert from modes that have tuples in the data list
+        # * e.g., RGB mode to an image
+        # * Saving this code to use in extensions
+
+        # * rgbList = list([])
 
         for bit in bits:
             count += 1
@@ -95,15 +100,18 @@ class Sink:
             intStr += bitStr
             if count == 8:
                 val = int(intStr, 2)
-                rgbList.append(val)
+                data.append(val)
 
-                if (len(rgbList) == 3):
-                    data.append(tuple(rgbList))
-                    rgbList = list([])
+                # * rgbList.append(val)
+
+                # * if (len(rgbList) == 3):
+                    # * data.append(tuple(rgbList))
+                    # * rgbList = list([])
 
                 count = 0
                 intStr = ""
 
+        
         img.putdata(data)
 
         img.save(filename)
