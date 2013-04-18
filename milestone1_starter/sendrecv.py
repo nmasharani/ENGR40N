@@ -95,7 +95,7 @@ if __name__ == '__main__':
     #instantiate and run the source block
     src = Source(opt.monotone, opt.fname)
     src_payload, databits = src.process()  
-    """
+    
     # instantiate and run the transmitter block
     xmitter = Transmitter(fc, opt.samplerate, opt.one, opt.spb, opt.silence)
     databits_with_preamble = xmitter.add_preamble(databits)
@@ -127,16 +127,9 @@ if __name__ == '__main__':
     barker_start = r.detect_preamble(demod_samples, thresh, one)
     rcdbits = r.demap_and_check(demod_samples, barker_start)
 
-    """
     # push into sink
     sink = Sink()
-<<<<<<< HEAD
-    rcdbits = databits
     rcd_payload = sink.process(rcdbits)
-=======
-    # rcd_payload = sink.process(rcdbits)
-    rcd_payload = sink.process(databits)
->>>>>>> f8628d343d90e27568c887104924aee63dd67828
     
     if len(rcd_payload) > 0:
         hd, err = common_srcsink.hamming(rcd_payload, src_payload)
@@ -148,5 +141,4 @@ if __name__ == '__main__':
                 len_mod = len(mod_samples) - opt.spb*opt.silence 
                 len_demod = len_mod - opt.spb*(len(src_payload) - len(rcd_payload))
                 plot_graphs(mod_samples, samples_rx[barker_start:], demod_samples[barker_start:barker_start + len_demod], opt.spb, src.srctype, opt.silence)
-
 
