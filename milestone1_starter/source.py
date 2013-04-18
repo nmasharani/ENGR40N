@@ -1,3 +1,5 @@
+# Nisha Masharani (nisham) and Luke Pappas (lpappas9)
+
 # audiocom library: Source and sink functions
 import common_srcsink as common
 import Image
@@ -15,8 +17,6 @@ class Source:
         self.fname = filename
         print 'Source: '
 
-    
-    
     def process(self):
         # Form the databits, from the filename 
         if self.fname is not None:
@@ -34,43 +34,43 @@ class Source:
                 
         #this makes the databits to be the header + payload, tested and works
         databits = np.append(header, payload);
-        return payload, databits
-
-    
-    
+        return payload, databits 
     
     def text2bits(self, filename):
         f = open(filename, 'r')
         fileStr = f.read()
+
         # http://stackoverflow.com/questions/8452961/convert-string-to-ascii-value-python
         ascii = np.array([ord(c) for c in fileStr], dtype=np.uint8)
         bits = np.unpackbits(ascii)
         return bits
 
-
-    
     def bits_from_image(self, filename):
         img = Image.open(filename)
 
-        # img.mode() must equal "RGB" for decoding to work
-        img = img.convert("RGB")
+        # img.mode() must equal "L" for decoding to work
+        img = img.convert("L")
         
         pixels = list(img.getdata())
+        array = np.array(pixels, dtype=np.uint8) 
+
+        # Use this code to convert from modes that have tuples in the data list
+        # e.g., RGB mode to a numpy array
+        # Saving this code to use in extensions
+        
+        """
         pixlist = list([])
         for t in pixels:
             for x in t:
                 pixlist.append(x)
         # converts to numpy array
         array = np.array(pixlist, dtype=np.uint8) 
+        """
         # converts to numpy bit array
         bits = np.unpackbits(array) 
         np.set_printoptions(threshold='nan')
         return bits
 
-    
-    
-    
-    
     def get_header(self, payload_length, srctype): 
         # Given the payload length and the type of source 
         # (image, text, monotone), form the header

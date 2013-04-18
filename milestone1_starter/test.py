@@ -4,7 +4,7 @@ import common_srcsink
 
 
 
-src = Source(0, "testfiles/A.txt")
+src = Source(0, "testfiles/checkerboard.png")
 
 
 src_payload, src_databits = src.process()
