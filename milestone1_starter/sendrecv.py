@@ -129,6 +129,7 @@ if __name__ == '__main__':
 
     # push into sink
     sink = Sink()
+    rcdbits = databits
     rcd_payload = sink.process(rcdbits)
     
     if len(rcd_payload) > 0:
