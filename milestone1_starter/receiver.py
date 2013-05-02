@@ -52,7 +52,7 @@ class Receiver:
 
         energy_offset = -1
 
-        for i in range(0, len(demod_samples)):
+        for i in range(0, len(demod_samples) - self.spb):
             cur_samples = demod_samples[i:i+self.spb]
             average_samples = cur_samples[self.spb/4 : self.spb * 3 / 4]
             average = sum(average_samples) / len(average_samples)

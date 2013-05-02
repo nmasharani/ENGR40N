@@ -40,6 +40,8 @@ rec = Receiver(1, 1, 4)
 zeros = numpy.zeros(10)
 
 received = numpy.concatenate((zeros, samples), axis=0)
+
+#received = numpy.zeros(50)
 for i in range(0, len(received)):
 	if received[i] > 1: 
 		received[i] = received[i] - random.uniform(0,2)
