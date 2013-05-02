@@ -1,6 +1,6 @@
 import math
 import common_txrx as common
-import numpy
+import numpy as np
 
 class Transmitter:
     def __init__(self, carrier_freq, samplerate, one, spb, silence):
@@ -19,6 +19,10 @@ class Transmitter:
             [silence bits], [preamble bits], and [databits]
         '''
         # fill in your implementation
+
+        preamble = [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1]
+
+        databits_with_preamble = np.concatenate((preamble, databits), axis=0)
         return databits_with_preamble
 
 
@@ -28,8 +32,17 @@ class Transmitter:
         Sample values for bit '1', '0' should be [one], 0 respectively.
         Output should be an array of samples.
         '''
-        # fill in your implemenation
-        return samples
+        samples = list([])
+
+        for bit in databits_with_preamble:
+            if (bit == 1):
+                for i in range(0,4):
+                    samples.append(self.one)
+            else:
+                for i in range(0,4):
+                    samples.append(0.0)
+
+        return np.array(samples)
         
 
     def modulate(self, samples):

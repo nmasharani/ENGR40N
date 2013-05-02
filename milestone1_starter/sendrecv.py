@@ -98,7 +98,7 @@ if __name__ == '__main__':
     
     # instantiate and run the transmitter block
     xmitter = Transmitter(fc, opt.samplerate, opt.one, opt.spb, opt.silence)
-    databits_with_preamble = xmitter.add_preamble(databits)
+    databits_with_preamble = xmitter.add_preamble(databits)    
     samples = xmitter.bits_to_samples(databits_with_preamble)
     mod_samples = xmitter.modulate(samples)
 
