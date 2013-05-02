@@ -26,20 +26,41 @@ class Receiver:
         No need to touch this.
         ''' 
         return receiver_mil3.detect_threshold(demod_samples)
- 
+
+    def dotprod(self, arr1, arr2):
+        if (len(arr1) != len(arr2)):
+            return -1
+
+        sum = 0.0;
+
+        for i in range(0, len(arr1)):
+            sum += arr1[i] * arr2[i]
+
+        return sum
+
     def detect_preamble(self, demod_samples, thresh, one):
         '''
         Find the sample corresp. to the first reliable bit "1"; this step 
         is crucial to a proper and correct synchronization w/ the xmitter.
         '''
 
+        
         '''
         First, find the first sample index where you detect energy based on the
         moving average method described in the milestone 2 description.
         '''
-        # Fill in your implementation of the high-energy check procedure
 
-        energy_offset = # fill in the result of the high-energy check
+        energy_offset = -1
+
+        for i in range(0, len(demod_samples)):
+            cur_samples = demod_samples[i:i+self.spb]
+            average_samples = cur_samples[self.spb/4 : self.spb * 3 / 4]
+            average = sum(average_samples) / len(average_samples)
+            if (average >= (one + thresh)/2):
+                energy_offset = i
+                print energy_offset
+                break
+
         if energy_offset < 0:
             print '*** ERROR: Could not detect any ones (so no preamble). ***'
             print '\tIncrease volume / turn on mic?'
@@ -52,8 +73,38 @@ class Receiver:
         samples is the highest. 
         '''
         # Fill in your implementation of the cross-correlation check procedure
-        
-        preamble_offset = # fill in the result of the cross-correlation check 
+
+        preamble = [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1]
+
+        preamble_len = len(preamble)
+
+        preamble_samples = list([])
+
+        for bit in preamble:
+            if (bit == 1):
+                for i in range(0, self.spb):
+                    preamble_samples.append(one)
+            else:
+                for i in range (0, self.spb):
+                    preamble_samples.append(0.0)
+
+        preamble_samples = numpy.array(preamble_samples)
+
+        # Fill in your implementation of the high-energy check procedure
+
+        correlation = list([])
+
+        # range will go through the entire array of demodulated samples, stopping
+        # when the remaining bits is too short to be the preamble
+        for i in range (0, len(demod_samples) - len(preamble_samples) - energy_offset):
+            current_range = demod_samples[i + energy_offset:i+len(preamble_samples) + energy_offset]
+            correlation.append(self.dotprod(current_range, preamble_samples))
+
+        maxindex = numpy.argmax(numpy.array(correlation))
+
+        preamble_offset = maxindex
+        print preamble_offset
+         # fill in the result of the cross-correlation check 
         
         '''
         [preamble_offset] is the additional amount of offset starting from [offset],
@@ -62,7 +113,9 @@ class Receiver:
         '''
 
         return energy_offset + preamble_offset
-        
+
+    
+
     def demap_and_check(self, demod_samples, preamble_start):
         '''
         Demap the demod_samples (starting from [preamble_start]) into bits.
