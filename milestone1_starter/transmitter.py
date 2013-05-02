@@ -36,10 +36,10 @@ class Transmitter:
 
         for bit in databits_with_preamble:
             if (bit == 1):
-                for i in range(0,4):
+                for i in range(0,self.spb):
                     samples.append(self.one)
             else:
-                for i in range(0,4):
+                for i in range(0,self.spb):
                     samples.append(0.0)
 
         return np.array(samples)
