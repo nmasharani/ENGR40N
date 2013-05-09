@@ -22,3 +22,6 @@ If you need any functions that
 you need commonly in both transmitter and receiver,
 implement here
 '''
+
+# get preamble bits
+# get preamble samples

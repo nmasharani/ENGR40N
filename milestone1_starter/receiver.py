@@ -129,7 +129,32 @@ class Receiver:
         Output is the array of data_bits (bits without preamble)
         '''
 
-        # Fill in your implementation
+        databits_list = list([])
+
+        preamble = [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1]
+
+        preamble_len = len(preamble)
+
+        thresh_one = list([])
+        thresh_zero = list([])
+
+        for i in range(0, preamble_len):
+            sample_index = i * self.spb + preamble_start
+            cur_samples = demod_samples[sample_index:sample_index + self.spb]
+            average_samples = cur_samples[self.spb/4 : self.spb * 3 / 4]
+            average = sum(average_samples) / len(average_samples)
+            if (preamble[i] == 1):
+                thresh_one.append(average)
+            else:
+                thresh_zero.append(average)
+
+        one = sum(thresh_one) / len(thresh_one)
+        zero = sum(thresh_zero) / len(thresh_zero)
+
+        thresh = (one + zero) / 2
+
+
+            
 
         return data_bits # without preamble
 
