@@ -153,10 +153,24 @@ class Receiver:
 
         thresh = (one + zero) / 2
 
+        bits = list([])
 
-            
+        for i in range(preamble_start, len(demod_samples), self.spb):
+            cur_samples = demod_samples[i:i + self.spb]
+            average_samples = cur_samples[self.spb/4 : self.spb * 3 / 4]
+            average = sum(average_samples) / len(average_samples)
 
-        return data_bits # without preamble
+            if (average > thresh):
+                bits.append(1)
+            else:
+                bits.append(0)
+
+        for i in range(0, preamble_len):
+            if preamble[i] != bits[i]:
+                print "Preamble was not detected"
+                sys.exit(1)
+
+        return bits[preamble_len:] # without preamble
 
     def demodulate(self, samples):
         return common.demodulate(self.fc, self.samplerate, samples)

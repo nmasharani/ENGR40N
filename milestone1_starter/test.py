@@ -25,7 +25,7 @@ print two
 """
 xmitter = Transmitter(1, 1, 5.0, 4, 1)
 
-preambleadded = xmitter.add_preamble([0,0,0,0,0])
+preambleadded = xmitter.add_preamble([1,0,1,0,0,0,0,0,0,0,0,0,1])
 
 print preambleadded
 
@@ -51,4 +51,8 @@ for i in range(0, len(received)):
 
 print received
 
-print rec.detect_preamble(received, 2.5, 5.0)
+preamble_start =  rec.detect_preamble(received, 2.5, 5.0)
+print preamble_start
+
+print rec.demap_and_check(received, preamble_start)
+

@@ -67,7 +67,7 @@ class Sink:
             charStr += bitStr
             if count == 8:
                 asciiVal = int(charStr, 2)
-                if (asciiVal >= 128 || asciiVal < 0):
+                if (asciiVal >= 128 or asciiVal < 0):
                     print "Bit error: value is outside the range of an ASCII value."
                     return ""
                 char = str(unichr(asciiVal));
