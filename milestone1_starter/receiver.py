@@ -50,6 +50,10 @@ class Receiver:
         moving average method described in the milestone 2 description.
         '''
 
+        numpy.set_printoptions(threshold=numpy.nan)
+
+        #print demod_samples
+
         energy_offset = -1
 
         for i in range(0, len(demod_samples) - self.spb):
@@ -58,8 +62,9 @@ class Receiver:
             average = sum(average_samples) / len(average_samples)
             if (average >= (one + thresh)/2):
                 energy_offset = i
-                print energy_offset
                 break
+
+        print "energy offset " + str(energy_offset)
 
         if energy_offset < 0:
             print '*** ERROR: Could not detect any ones (so no preamble). ***'
@@ -96,9 +101,13 @@ class Receiver:
 
         # range will go through the entire array of demodulated samples, stopping
         # when the remaining bits is too short to be the preamble
-        for i in range (0, len(demod_samples) - len(preamble_samples) - energy_offset):
-            current_range = demod_samples[i + energy_offset:i+len(preamble_samples) + energy_offset]
-            correlation.append(self.dotprod(current_range, preamble_samples))
+
+        for i in range (energy_offset, len(demod_samples) - len(preamble_samples)):
+            current_range = demod_samples[i:i+len(preamble_samples)]
+            dot = numpy.dot(current_range, preamble_samples)
+            correlation.append(dot/numpy.linalg.norm(current_range))
+             
+
 
         maxindex = numpy.argmax(numpy.array(correlation))
 
@@ -157,6 +166,8 @@ class Receiver:
 
         for i in range(preamble_start, len(demod_samples), self.spb):
             cur_samples = demod_samples[i:i + self.spb]
+            if (len(cur_samples) < self.spb):
+                break
             average_samples = cur_samples[self.spb/4 : self.spb * 3 / 4]
             average = sum(average_samples) / len(average_samples)
 

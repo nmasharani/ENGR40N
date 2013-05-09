@@ -100,6 +100,8 @@ if __name__ == '__main__':
     xmitter = Transmitter(fc, opt.samplerate, opt.one, opt.spb, opt.silence)
     databits_with_preamble = xmitter.add_preamble(databits)    
     samples = xmitter.bits_to_samples(databits_with_preamble)
+
+    numpy.set_printoptions(threshold=numpy.nan)
     mod_samples = xmitter.modulate(samples)
 
 ####################################    
@@ -123,6 +125,7 @@ if __name__ == '__main__':
     # make receiver
     r = Receiver(fc, opt.samplerate, opt.spb)
     demod_samples = r.demodulate(samples_rx)
+
     one, zero, thresh = r.detect_threshold(demod_samples)
     barker_start = r.detect_preamble(demod_samples, thresh, one)
     rcdbits = r.demap_and_check(demod_samples, barker_start)
