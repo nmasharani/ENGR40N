@@ -85,7 +85,9 @@ class Receiver:
         for i in range (energy_offset, demod_samples_length - preamble_samples_length):
             current_range = demod_samples[i:i + preamble_samples_length]
             dot = numpy.dot(current_range, preamble_samples)
-            correlation.append(dot/numpy.linalg.norm(current_range))
+            norm = LA.norm(current_range)
+            if norm != 0:
+                correlation.append(dot/norm)
 
         maxindex = numpy.argmax(numpy.array(correlation))
 
