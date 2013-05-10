@@ -1,0 +1,21 @@
+Running sendrecv.py
+Parameters in experiment:
+	Samples per bit: 256
+	Channel type: Audio
+	Frequency: 1000 Hz
+Source: 
+Transmitter: 
+	Sent preamble: [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1]
+	Number of samples being sent: 152064
+Receiver: 
+energy offset 38587
+	0/1 threshold: 0.0393272219635
+	one: 0.0605252269374
+	zero: 0.0181292169896
+Sink:
+	Recd header:  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0]
+	Length from header:  336
+	Source type:  txt
+Speak the truth, even if your voice shakes
+[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0]
+Hamming distance for payload at frequency 1000 Hz: 0 BER: 0.0

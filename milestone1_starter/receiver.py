@@ -57,9 +57,11 @@ class Receiver:
         print "energy offset " + str(energy_offset)
 
         if energy_offset < 0:
+            print ""
             print '*** ERROR: Could not detect any ones (so no preamble). ***'
             print '\tIncrease volume / turn on mic?'
             print '\tOr is there some other synchronization bug? ***'
+            print ""
             sys.exit(1)
 
         '''
@@ -92,6 +94,7 @@ class Receiver:
         maxindex = numpy.argmax(numpy.array(correlation))
 
         preamble_offset = maxindex
+        print "Preamble offset: " + str(preamble_offset)
         #print preamble_offset
          # fill in the result of the cross-correlation check 
         
@@ -119,11 +122,8 @@ class Receiver:
         '''
 
         databits_list = list([])
-
         preamble = common.get_Preamble()
-
         preamble_len = len(preamble)
-
         thresh_one = list([])
         thresh_zero = list([])
 
@@ -137,11 +137,10 @@ class Receiver:
             else:
                 thresh_zero.append(average)
 
+        #Update the one, zero, and thresh values
         one = sum(thresh_one) / float(len(thresh_one))
         zero = sum(thresh_zero) / float(len(thresh_zero))
-
         thresh = (one + zero) / 2.0
-
 
         print "\t0/1 threshold: " + str(thresh)
         print "\tone: " + str(one)
@@ -156,19 +155,20 @@ class Receiver:
                 break
             average_samples = cur_samples[self.spb/4 : self.spb * 3 / 4]
             average = sum(average_samples) / len(average_samples)
-
             if (average > thresh):
                 bits.append(1)
             else:
                 bits.append(0)
 
+    # check the recieved preamble and compare to actual
         for i in range(0, preamble_len):
             if preamble[i] != bits[i]:
-
                 print "\tPreamble was not detected"
                 print bits[0:preamble_len]
                 sys.exit(1)
 
+        print "Received Preamble: " + str(bits[0:preamble_len])
+        print ""
         return bits[preamble_len:] # without preamble
 
     def demodulate(self, samples):
