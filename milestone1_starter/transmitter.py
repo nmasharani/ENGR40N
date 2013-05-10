@@ -20,11 +20,9 @@ class Transmitter:
         '''
         # fill in your implementation
 
-        preamble = [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1]
-
+        preamble = common.get_Preamble()
         print "\tSent preamble: " + str(preamble)
         databits_with_preamble = np.concatenate((np.zeros(self.silence), preamble, databits), axis=0)
-        print "\tdatabits: " + str(databits_with_preamble)
         return databits_with_preamble
 
 

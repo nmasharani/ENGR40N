@@ -27,17 +27,6 @@ class Receiver:
         ''' 
         return receiver_mil3.detect_threshold(demod_samples)
 
-    def dotprod(self, arr1, arr2):
-        if (len(arr1) != len(arr2)):
-            return -1
-
-        sum = 0.0;
-
-        for i in range(0, len(arr1)):
-            sum += arr1[i] * arr2[i]
-
-        return sum
-
     def detect_preamble(self, demod_samples, thresh, one):
         '''
         Find the sample corresp. to the first reliable bit "1"; this step 
@@ -56,7 +45,8 @@ class Receiver:
 
         energy_offset = -1
 
-        for i in range(0, len(demod_samples) - self.spb):
+        demod_samples_length = len(demod_samples)
+        for i in range(0, demod_samples_length - self.spb):
             cur_samples = demod_samples[i:i+self.spb]
             average_samples = cur_samples[self.spb/4 : self.spb * 3 / 4]
             average = sum(average_samples) / len(average_samples)
@@ -79,21 +69,10 @@ class Receiver:
         '''
         # Fill in your implementation of the cross-correlation check procedure
 
-        preamble = [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1]
+        preamble = common.get_Preamble()
 
         preamble_len = len(preamble)
-
-        preamble_samples = list([])
-
-        for bit in preamble:
-            if (bit == 1):
-                for i in range(0, self.spb):
-                    preamble_samples.append(one)
-            else:
-                for i in range (0, self.spb):
-                    preamble_samples.append(0.0)
-
-        preamble_samples = numpy.array(preamble_samples)
+        preamble_samples = common.get_Preamble_Samples(self.spb, preamble, one)
 
         # Fill in your implementation of the high-energy check procedure
 
@@ -102,8 +81,9 @@ class Receiver:
         # range will go through the entire array of demodulated samples, stopping
         # when the remaining bits is too short to be the preamble
 
-        for i in range (energy_offset, len(demod_samples) - len(preamble_samples)):
-            current_range = demod_samples[i:i+len(preamble_samples)]
+        preamble_samples_length = len(preamble_samples)
+        for i in range (energy_offset, demod_samples_length - preamble_samples_length):
+            current_range = demod_samples[i:i + preamble_samples_length]
             dot = numpy.dot(current_range, preamble_samples)
             correlation.append(dot/numpy.linalg.norm(current_range))
 
@@ -138,7 +118,7 @@ class Receiver:
 
         databits_list = list([])
 
-        preamble = [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1]
+        preamble = common.get_Preamble()
 
         preamble_len = len(preamble)
 
@@ -167,7 +147,8 @@ class Receiver:
 
         bits = list([])
 
-        for i in range(preamble_start, len(demod_samples), self.spb):
+        demod_samples_length = len(demod_samples)
+        for i in range(preamble_start, demod_samples_length, self.spb):
             cur_samples = demod_samples[i:i + self.spb]
             if (len(cur_samples) < self.spb):
                 break
