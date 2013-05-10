@@ -104,6 +104,8 @@ if __name__ == '__main__':
     numpy.set_printoptions(threshold=numpy.nan)
     mod_samples = xmitter.modulate(samples)
 
+
+    #print mod_samples
 ####################################    
     # create channel instance
     if opt.bypass:
@@ -120,6 +122,8 @@ if __name__ == '__main__':
         print "I didn't get any samples; is your microphone or speaker OFF?"
         sys.exit(1)
 #################################
+
+    #print samples_rx
 
     # process the received samples
     # make receiver

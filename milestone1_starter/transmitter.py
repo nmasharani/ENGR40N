@@ -22,7 +22,9 @@ class Transmitter:
 
         preamble = [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1]
 
-        databits_with_preamble = np.concatenate((preamble, databits), axis=0)
+        print "\tSent preamble: " + str(preamble)
+        databits_with_preamble = np.concatenate((np.zeros(self.silence), preamble, databits), axis=0)
+        print "\tdatabits: " + str(databits_with_preamble)
         return databits_with_preamble
 
 
@@ -41,6 +43,8 @@ class Transmitter:
             else:
                 for i in range(0,self.spb):
                     samples.append(0.0)
+
+        print "\tNumber of samples being sent: " + str(len(samples))
 
         return np.array(samples)
         

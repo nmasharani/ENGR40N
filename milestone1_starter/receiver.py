@@ -106,13 +106,11 @@ class Receiver:
             current_range = demod_samples[i:i+len(preamble_samples)]
             dot = numpy.dot(current_range, preamble_samples)
             correlation.append(dot/numpy.linalg.norm(current_range))
-             
-
 
         maxindex = numpy.argmax(numpy.array(correlation))
 
         preamble_offset = maxindex
-        print preamble_offset
+        #print preamble_offset
          # fill in the result of the cross-correlation check 
         
         '''
@@ -157,10 +155,15 @@ class Receiver:
             else:
                 thresh_zero.append(average)
 
-        one = sum(thresh_one) / len(thresh_one)
-        zero = sum(thresh_zero) / len(thresh_zero)
+        one = sum(thresh_one) / float(len(thresh_one))
+        zero = sum(thresh_zero) / float(len(thresh_zero))
 
-        thresh = (one + zero) / 2
+        thresh = (one + zero) / 2.0
+
+
+        print "\t0/1 threshold: " + str(thresh)
+        print "\tone: " + str(one)
+        print "\tzero: " + str(zero)
 
         bits = list([])
 
@@ -178,7 +181,9 @@ class Receiver:
 
         for i in range(0, preamble_len):
             if preamble[i] != bits[i]:
-                print "Preamble was not detected"
+
+                print "\tPreamble was not detected"
+                print bits[0:preamble_len]
                 sys.exit(1)
 
         return bits[preamble_len:] # without preamble
