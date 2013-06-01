@@ -18,6 +18,8 @@ class Receiver:
         self.fc = carrier_freq
         self.samplerate = samplerate
         self.spb = spb 
+        print ""
+        print ""
         print 'Receiver: '
 
     def detect_threshold(self, demod_samples):
@@ -94,6 +96,7 @@ class Receiver:
         maxindex = numpy.argmax(numpy.array(correlation))
 
         preamble_offset = maxindex
+        print "Max Correlation Value: " + str(correlation[maxindex])
         print "Preamble offset: " + str(preamble_offset)
         #print preamble_offset
          # fill in the result of the cross-correlation check 
@@ -141,10 +144,11 @@ class Receiver:
         one = sum(thresh_one) / float(len(thresh_one))
         zero = sum(thresh_zero) / float(len(thresh_zero))
         thresh = (one + zero) / 2.0
-
+        print ""
         print "\t0/1 threshold: " + str(thresh)
         print "\tone: " + str(one)
         print "\tzero: " + str(zero)
+        print ""
 
         bits = list([])
 
@@ -161,11 +165,12 @@ class Receiver:
                 bits.append(0)
 
     # check the recieved preamble and compare to actual
-        for i in range(0, preamble_len):
-            if preamble[i] != bits[i]:
-                print "\tPreamble was not detected"
-                print bits[0:preamble_len]
-                sys.exit(1)
+    #COMMENTED OUT AS PER THE MILESTONE 3 INSTRUCTIONS!!!!
+        #for i in range(0, preamble_len):
+            #if preamble[i] != bits[i]:
+                #print "\tPreamble was not detected"
+                #print bits[0:preamble_len]
+                #sys.exit(1)
 
         print "Received Preamble: " + str(bits[0:preamble_len])
         print ""

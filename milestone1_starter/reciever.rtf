@@ -1,0 +1,162 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\fs24 \cf0 import sys\
+import math\
+import numpy\
+import scipy.cluster.vq\
+import common_txrx as common\
+from numpy import linalg as LA\
+import receiver_mil3\
+\
+class Receiver:\
+    def __init__(self, carrier_freq, samplerate, spb):\
+        '''\
+        The physical-layer receive function, which processes the\
+        received samples by detecting the preamble and then\
+        demodulating the samples from the start of the preamble \
+        sequence. Returns the sequence of received bits (after\
+        demapping)\
+        '''\
+        self.fc = carrier_freq\
+        self.samplerate = samplerate\
+        self.spb = spb \
+        print 'Receiver: '\
+\
+    def detect_threshold(self, demod_samples):\
+        '''\
+        Calls the detect_threshold function in another module.\
+        No need to touch this.\
+        ''' \
+        return receiver_mil3.detect_threshold(demod_samples)\
+ \
+    def detect_preamble(self, demod_samples, thresh, one):\
+        '''\
+        Find the sample corresp. to the first reliable bit "1"; this step \
+        is crucial to a proper and correct synchronization w/ the xmitter.\
+        '''\
+\
+        '''\
+        First, find the first sample index where you detect energy based on the\
+        moving average method described in the milestone 2 description.\
+        '''\
+        # Fill in your implementation of the high-energy check procedure\
+        energy_offset = -1\
+        demod_samples_length = len(demod_samples)\
+        for index in xrange(0,demod_samples_length - self.spb):\
+            cluster = demod_samples[index + ((self.spb) / 4) : index + ((self.spb * 3) / 4)]\
+            cluster_sum = numpy.sum(cluster, axis = None, dtype = float, out = None)\
+            cluster_Average = cluster_sum / 2.0\
+            if (cluster_Average > ((one + thresh) / 2.0)):\
+                energy_offset = index\
+                break\
+\
+        #return energy_offset\
+\
+        if energy_offset < 0:\
+            print '*** ERROR: Could not detect any ones (so no preamble). ***'\
+            print '\\tIncrease volume / turn on mic?'\
+            print '\\tOr is there some other synchronization bug? ***'\
+            sys.exit(1)\
+\
+        '''\
+        Then, starting from the demod_samples[offset], find the sample index where\
+        the cross-correlation between the signal samples and the preamble \
+        samples is the highest. \
+        '''\
+        # Fill in your implementation of the cross-correlation check procedure\
+        preamble = [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1]\
+        preamble_list = list([])\
+        for bit in preamble:\
+            if bit == 1:\
+                for i in xrange(0,self.spb):\
+                    preamble_list.append(1)\
+            else: \
+                for i in xrange(0,self.spb):\
+                    preamble_list.append(0)\
+        preamble_in_samples = numpy.array(preamble_list)\
+        preamble_length = len(preamble_in_samples)\
+        preamble_offset = 0 \
+        largest_Correlation_So_Far = 0\
+        for index in xrange(energy_offset, energy_offset + (preamble_length * 3)):\
+            curr_Cluster = demod_samples[index : (index + preamble_length)]\
+            curr_Cluster_Correlation_Value = numpy.dot(curr_Cluster, preamble_in_samples, out = None)\
+            if curr_Cluster_Correlation_Value > largest_Correlation_So_Far:\
+                preamble_offset = index\
+                largest_Correlation_So_Far = curr_Cluster_Correlation_Value\
+\
+        print preamble_offset\
+        return preamble_offset\
+        '''\
+        [preamble_offset] is the additional amount of offset starting from [offset],\
+        (not a absolute index reference by [0]). \
+        Note that the final return value is [offset + pre_offset]\
+        '''\
+        \
+    def demap_and_check(self, demod_samples, preamble_start):\
+        '''\
+        Demap the demod_samples (starting from [preamble_start]) into bits.\
+        1. Calculate the average values of midpoints of each [spb] samples\
+           and match it with the known preamble bit values.\
+        2. Use the average values and bit values of the preamble samples from (1)\
+           to calculate the new [thresh], [one], [zero]\
+        3. Demap the average values from (1) with the new three values from (2)\
+        4. Check whether the first [preamble_length] bits of (3) are equal to\
+           the preamble. If it is proceed, if not terminate the program. \
+        Output is the array of data_bits (bits without preamble)\
+        '''\
+        preamble = [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1]\
+        preamble_length = len(preamble)\
+        new_One_Value = 0\
+        new_Zero_Value = 0\
+        new_Threshold = 0\
+        one_List = list([])\
+        zero_List = list([])\
+        for i in xrange(0,preamble_length):\
+            startIndex = i * self.spb + preamble_start\
+            cluster_From_Samples = demod_samples[startIndex + (self.spb / 4) : startIndex + ((self.spb * 3) / 4)]\
+            cluster_Sum = numpy.sum(cluster_From_Samples, axis = None, dtype = float, out = None)\
+            average = cluster_Sum / len(cluster_From_Samples)\
+            if preamble[i] == 1:\
+                one_List.append(average)\
+            else:\
+                zero_List.append(average)\
+        ones_cluster_values_array = numpy.array(one_List)\
+        ones_cluster_values_array_sum = numpy.sum(ones_cluster_values_array, axis = None, dtype = float, out = None)\
+        new_One_Value = ones_cluster_values_array_sum / len(ones_cluster_values_array)\
+\
+        zeros_cluster_values_array = numpy.array(zero_List)\
+        zeros_cluster_values_array_sum = numpy.sum(zeros_cluster_values_array, axis = None, dtype = float, out = None)\
+        new_Zero_Value = zeros_cluster_values_array_sum / len(zeros_cluster_values_array)\
+\
+        new_Threshold = ((new_One_Value + new_Zero_Value) / 2.0)\
+\
+        bits_list = list([])\
+        demod_samples_length = len(demod_samples)\
+        for index in xrange(0, ((demod_samples_length - preamble_start) / self.spb)):\
+            start = preamble_start + (i * self.spb)\
+            curr_Sample_Cluster = demod_samples[ start + (self.spb / 4) : start + ((self.spb * 3) / 4)]\
+            curr_Sample_Cluster_sum = numpy.sum(curr_Sample_Cluster, axis = None, dtype = float, out = None)\
+            curr_Sample_Cluster_Average_Value = curr_Sample_Cluster_sum / len(curr_Sample_Cluster)\
+            if curr_Sample_Cluster_Average_Value > new_Threshold:\
+                bits_list.append(1)\
+            else: bits_list.append(0)\
+        \
+        bits = numpy.array(bits_list)\
+        for index in xrange(0,24):\
+            if bits[index] != preamble[index]:\
+                print 'could not detect preamble'\
+\
+        return bits[24:]\
+\
+\
+        # Fill in your implementation\
+\
+        #return data_bits # without preamble\
+\
+    def demodulate(self, samples):\
+        return common.demodulate(self.fc, self.samplerate, samples)\
+}

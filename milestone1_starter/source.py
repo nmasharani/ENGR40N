@@ -22,7 +22,8 @@ class Source:
         if self.fname is not None:
             if self.fname.endswith('.png') or self.fname.endswith('.PNG'):
                 payload = self.bits_from_image(self.fname)
-                header = self.get_header(payload.shape[0], "img")
+                header = self.get_header(payload.shape[0], "img") #note that shape[0] returns the length of the payload array. 
+                # refer to http://stackoverflow.com/questions/10200268/python-what-does-shape-do-in-for-i-in-rangey-shape0 if necessary for shape[0]
             else:           
                 payload = self.text2bits(self.fname)
                 header = self.get_header(payload.shape[0], "txt")
@@ -34,6 +35,8 @@ class Source:
                 
         #this makes the databits to be the header + payload, tested and works
         databits = np.append(header, payload);
+        #process is now going to return the orignial source bits(payload) and then
+        # return the header+huffman encoded bits as well. 
         return payload, databits 
     
     def text2bits(self, filename):
@@ -85,7 +88,9 @@ class Source:
         else:
             #monotone
             headerstr += "00"
-        headerstr += bin(payload_length)[2:].zfill(32)
+        headerstr += bin(payload_length)[2:].zfill(16)
         header = np.fromstring(headerstr, dtype=np.uint8)
         header[:] = [x - 48 for x in header]
+        print "header = " 
+        print header
         return header

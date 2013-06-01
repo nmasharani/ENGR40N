@@ -11,6 +11,8 @@ import random
 class Sink:
     def __init__(self):
         # no initialization required for sink 
+        print ""
+        print ""
         print 'Sink:'
 
     def process(self, recd_bits):
@@ -36,19 +38,21 @@ class Sink:
         #5. convert the payload array of 1's and 0's to image or text
         # based on the header info.
         
-        header = recd_bits[0:34]
+        header = recd_bits[0:18]
         type, payloadLength = self.read_header(header)
-        bits = recd_bits[34:34 + payloadLength] #truncate based on size
+        bits = recd_bits[18:18 + payloadLength] #truncate based on size
         if type == "txt":
             text = self.bits2text(bits)
+            print "Received the following text: "
             print text
         elif type == "img":
+            print "Received Image"
             self.image_from_bits(bits, "rcd-image.png", payloadLength)
         else:
+            print "Received the following monotone signal: "
             print bits #monotone
         
-        print header
-
+        print ""
         return bits
         
         
@@ -76,19 +80,14 @@ class Sink:
 
         return  text
 
-            
-            
     def image_from_bits(self, bits,filename, payloadLength):
         # Convert the received payload to an image and save it
 
         # No return value required.
 
         img = Image.new("L", (32, 32))
-
         # need to get bit string into format [(r, g, b), (r, g, b), (r, g, b)]
-
         data = list([])
-
         count = 0
         intStr = ""
 
@@ -114,10 +113,8 @@ class Sink:
 
                 count = 0
                 intStr = ""
-
         
         img.putdata(data)
-
         img.save(filename)
 
         pass 
@@ -132,7 +129,7 @@ class Sink:
         # then convert the remaining payload size bits to string
         # convert that string to an int
         typeBits = header_bits[0:2]
-        payloadLengthInBinary = header_bits[2:34]
+        payloadLengthInBinary = header_bits[2:18]
         if typeBits[0] == 1:
             srctype = "txt"
         elif typeBits[1] == 1:
@@ -145,7 +142,9 @@ class Sink:
             bitStr = str(bit)
             payloadLengthString += bitStr
         payload_length = int(payloadLengthString, 2);
+        print ""
         print '\tRecd header: ', header_bits
         print '\tLength from header: ', payload_length
         print '\tSource type: ', srctype
+        print ""
         return srctype, payload_length
