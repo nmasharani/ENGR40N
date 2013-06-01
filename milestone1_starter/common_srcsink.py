@@ -19,7 +19,8 @@ def build_huffman_tree(symbol_frequencies_dict):
     pq = list([])
     for key in symbol_frequencies_dict:
         curr = (symbol_frequencies_dict[key], key)
-        pq.append(curr)
+        if symbol_frequencies_dict[key] != 0:
+            pq.append(curr)
 
     heapq.heapify(pq) # this now makes pq an ordered list of (num occurences, symbol value) tuples. 
     while 1:
