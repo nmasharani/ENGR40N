@@ -28,6 +28,7 @@ class Source:
             else:           
                 payload = self.text2bits(self.fname)
                 compressed_payload, symbol_frequency_dict = self.huffman_encode(payload)
+                print compressed_payload
                 header = self.get_header(payload.shape[0], "txt")
     
         else:
@@ -46,13 +47,14 @@ class Source:
         symbol_frequency_dict = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
         #then process each 4 bit symbol at a time, and update corresponding
         # value in the dictionary by one. 
+        symbol_length = 4
         count = 0
         symbol_str = ""
         for bit in original_payload:
             count = count + 1
             bitStr = str(bit)
             symbol_str += bitStr
-            if count == 4:
+            if count == symbol_length:
                 val = int(symbol_str, 2)
                 symbol_frequency_dict[val] = symbol_frequency_dict[val] + 1
                 count = 0
@@ -63,7 +65,31 @@ class Source:
         huffman_tree_root = common.build_huffman_tree(symbol_frequency_dict)
         codeword_map = common.build_codeword_map(huffman_tree_root)
 
-        return codeword_map, symbol_frequency_dict
+        #now I compress the orignial bit string by replacing every 4 bit symbol
+        # with its corresponding huffman code_word
+        count = 0
+        curr_symbol_str = ""
+        compressed_string = ""
+        for bit in original_payload:
+            count = count + 1
+            curr_bit = str(bit)
+            curr_symbol_str += curr_bit
+            if count == symbol_length:
+                val = int(curr_symbol_str, 2)
+                code_word = codeword_map[val]
+                compressed_string += code_word
+                count = 0
+                curr_symbol_str = ""
+
+        # now turn the string into an array of bits
+        compressed_bits_list = list([])
+        cmpressed_string_len = len(compressed_string)
+        for i in range(0,cmpressed_string_len):
+            compressed_bits_list.append(compressed_string[i])
+
+        print compressed_bits_list
+        compresssed_bit_array = numpy.array(compressed_bits_list)
+        return compresssed_bit_array, symbol_frequency_dict
     
     def text2bits(self, filename):
         f = open(filename, 'r')
