@@ -6,6 +6,7 @@ import Image
 from graphs import *
 import binascii
 import random
+import numpy as np
 
 
 class Sink:
@@ -39,13 +40,21 @@ class Sink:
         # based on the header info.
         
         header = recd_bits[0:18]
-        type, payloadLength = self.read_header(header)
+        src_type, payloadLength = self.read_type_size(header)
         bits = recd_bits[18:18 + payloadLength] #truncate based on size
-        if type == "txt":
+        if src_type == "txt":
+            header_symbol_stats = bits[0:160]
+            frequency_map = self.read_stat(header_symbol_stats)
+            encoded_bits = bits[160:]
+            bits = self.huffman_decode(frequency_map, encoded_bits)
             text = self.bits2text(bits)
             print "Received the following text: "
             print text
-        elif type == "img":
+        elif src_type == "img":
+            header_symbol_stats = bits[0:160]
+            encoded_bits = bits[160:]
+            frequency_map = self.read_stat(header_symbol_stats)
+            bits = self.huffman_decode(frequency_map, encoded_bits)
             print "Received Image"
             self.image_from_bits(bits, "rcd-image.png", payloadLength)
         else:
@@ -54,7 +63,57 @@ class Sink:
         
         print ""
         return bits
+
+    def huffman_decode(self, frequency_map, encoded_bits):
+        huffman_tree_root = common_srcsink.build_huffman_tree(frequency_map)
+        codeword_map = common_srcsink.build_codeword_map(huffman_tree_root)
+        print "sink codeword map"
+        for key in codeword_map:
+            print "key = " + str(key) + " and val = " + str(codeword_map[key])
+
+        #builds the decode map by reversing the key value pairs
+        decode_map = {}
+        for key in codeword_map:
+            decode_map[codeword_map[key]] = key
+
+        #here is where we do the decoding
+        curr_str = ""
+        decoded_str = ""
+        for bit in encoded_bits:
+            curr_str += str(bit)
+            if ((curr_str in decode_map) == True):
+                symbol_val = decode_map[curr_str]
+                symbol_str = str(bin(symbol_val)[2:].zfill(4))
+                print symbol_str
+                decoded_str += symbol_str
+                curr_str = ""
+
+        decoded_bits = np.fromstring(decoded_str, dtype=np.uint8)
+        decoded_bits[:] = [x - 48 for x in decoded_bits]
+        print "recieived decoded bits:"
+        print decoded_bits
+        print ""
+        return decoded_bits
+            
         
+    def read_stat(self, stats):
+        frequency_map = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
+        count = 0
+        bitstring =""
+        for bit in stats:
+            count = count + 1
+            curr_bit = str(bit)
+            bitstring += curr_bit
+            if count == 10:
+                symbol_str = bitstring[0:4]
+                frequency_str = bitstring[4:10]
+                symbol_val = int(symbol_str, 2)
+                frequency_val = int(frequency_str, 2)
+                frequency_map[symbol_val] = frequency_val
+                count = 0
+                bitstring = ""
+
+        return frequency_map
         
         
     #return rcd_payload
@@ -121,7 +180,7 @@ class Sink:
 
             
             
-    def read_header(self, header_bits): 
+    def read_type_size(self, header_bits): 
         # Given the header bits, compute the payload length
         # and source type (compatible with get_header on source)
         #this funtion is now working LMP

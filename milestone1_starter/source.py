@@ -21,13 +21,13 @@ class Source:
         # Form the databits, from the filename 
         if self.fname is not None:
             if self.fname.endswith('.png') or self.fname.endswith('.PNG'):
-                payload = self.bits_from_image(self.fname)
-                compressed_payload, symbol_frequency_dict = self.huffman_encode(payload)
-                header = self.get_header(payload.shape[0], "img") #note that shape[0] returns the length of the payload array. 
+                pre_payload = self.bits_from_image(self.fname)
+                payload, symbol_frequency_dict = self.huffman_encode(pre_payload)
+                header = self.get_huffman_header(payload.shape[0], "img", symbol_frequency_dict) #note that shape[0] returns the length of the payload array. 
                 # refer to http://stackoverflow.com/questions/10200268/python-what-does-shape-do-in-for-i-in-rangey-shape0 if necessary for shape[0]
             else:           
-                payload = self.text2bits(self.fname)
-                compressed_payload, symbol_frequency_dict = self.huffman_encode(payload)
+                pre_payload = self.text2bits(self.fname)
+                payload, symbol_frequency_dict = self.huffman_encode(pre_payload) 
                 header = self.get_huffman_header(payload.shape[0], "txt", symbol_frequency_dict)
     
         else:
@@ -63,6 +63,9 @@ class Source:
         # and return a dictionary mapping symbols (4 bit strings as int values) to codeword strings. 
         huffman_tree_root = common.build_huffman_tree(symbol_frequency_dict)
         codeword_map = common.build_codeword_map(huffman_tree_root)
+        print "source codeword map"
+        for key in codeword_map:
+            print "key = " + str(key) + " and val = " + str(codeword_map[key]) 
 
         #now I compress the orignial bit string by replacing every 4 bit symbol
         # with its corresponding huffman code_word
@@ -84,9 +87,10 @@ class Source:
         compressed_bits_list = list([])
         cmpressed_string_len = len(compressed_string)
         for i in range(0,cmpressed_string_len):
-            compressed_bits_list.append(compressed_string[i])
+            bit_val = int(compressed_string[i])
+            compressed_bits_list.append(bit_val)
 
-        compresssed_bit_array = numpy.array(compressed_bits_list)
+        compresssed_bit_array = np.array(compressed_bits_list)
         return compresssed_bit_array, symbol_frequency_dict
     
     def text2bits(self, filename):
