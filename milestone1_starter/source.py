@@ -22,10 +22,12 @@ class Source:
         if self.fname is not None:
             if self.fname.endswith('.png') or self.fname.endswith('.PNG'):
                 payload = self.bits_from_image(self.fname)
+                compressed_payload, symbol_frequency_dict = self.huffman_encode(payload)
                 header = self.get_header(payload.shape[0], "img") #note that shape[0] returns the length of the payload array. 
                 # refer to http://stackoverflow.com/questions/10200268/python-what-does-shape-do-in-for-i-in-rangey-shape0 if necessary for shape[0]
             else:           
                 payload = self.text2bits(self.fname)
+                compressed_payload, symbol_frequency_dict = self.huffman_encode(payload)
                 header = self.get_header(payload.shape[0], "txt")
     
         else:
@@ -38,6 +40,28 @@ class Source:
         #process is now going to return the orignial source bits(payload) and then
         # return the header+huffman encoded bits as well. 
         return payload, databits 
+
+    def huffman_encode(self, original_payload):
+        #initialize the dictionary to zro for all possible symbols, where the symblos are the keys in the dictionary, listed under their integer equivalents (ie 1111 would be listed under 15)
+        symbol_frequency_dict = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
+        #then process each 4 bit symbol at a time, and update corresponding
+        # value in the dictionary by one. 
+        count = 0
+        symbol_str = ""
+        for bit in original_payload:
+            count = count + 1
+            bitStr = str(bit)
+            symbol_str += bitStr
+            if count == 4:
+                val = int(symbol_str, 2)
+                symbol_frequency_dict[val] = symbol_frequency_dict[val] + 1
+                count = 0
+                symbol_str = ""
+
+        #have the frequencies, now I need to build the huffman encoding
+        # and return a dictionary mapping symbols (4 bit strings as int values) to codeword strings. 
+
+        return something, symbol_frequency_dict
     
     def text2bits(self, filename):
         f = open(filename, 'r')
