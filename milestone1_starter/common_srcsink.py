@@ -3,6 +3,50 @@
 import numpy
 import math
 import operator
+import Queue
+import heapq
+
+class node(object):
+    left = None
+    right = None
+    def __init__(self, left, right):
+        self.left = left
+        self.right = right
+    def children(self):
+        return self.left, self.right
+
+def build_huffman_tree(symbol_frequencies_dict):
+    pq = list([])
+    for key in symbol_frequencies_dict:
+        curr = (symbol_frequencies_dict[key], key)
+        pq.append(curr)
+
+    heapq.heapify(pq) # this now makes pq an ordered list of (num occurences, symbol value) tuples. 
+    while 1:
+        if len(pq) == 1:
+            break
+        left = heapq.heappop(pq)
+        right = heapq.heappop(pq)
+        super_node = node(left, right)
+        heapq.heappush(pq, (left[0] + right[0], super_node))
+
+    return heapq.heappop(pq)
+
+def walk_tree(curr_node, curr_code, codeword_map):
+    if type(curr_node[1]) == int:
+        symbol_val = curr_node[1]
+        codeword_map[symbol_val] = curr_code
+    else:
+        left, right = curr_node[1].children()
+        walk_tree(left, curr_code + "0", codeword_map)
+        walk_tree(right, curr_code + "1", codeword_map)
+
+def build_codeword_map(root_node):
+    codeword_map = {}
+    begin_string = ""
+    walk_tree(root_node, begin_string, codeword_map)
+    return codeword_map
+
 
 # Methods common to both the transmitter and receiver.
 def hamming(s1,s2):

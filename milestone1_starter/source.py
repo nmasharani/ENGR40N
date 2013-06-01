@@ -60,8 +60,10 @@ class Source:
 
         #have the frequencies, now I need to build the huffman encoding
         # and return a dictionary mapping symbols (4 bit strings as int values) to codeword strings. 
+        huffman_tree_root = common.build_huffman_tree(symbol_frequency_dict)
+        codeword_map = common.build_codeword_map(huffman_tree_root)
 
-        return something, symbol_frequency_dict
+        return codeword_map, symbol_frequency_dict
     
     def text2bits(self, filename):
         f = open(filename, 'r')
