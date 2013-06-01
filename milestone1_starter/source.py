@@ -28,8 +28,7 @@ class Source:
             else:           
                 payload = self.text2bits(self.fname)
                 compressed_payload, symbol_frequency_dict = self.huffman_encode(payload)
-                print compressed_payload
-                header = self.get_header(payload.shape[0], "txt")
+                header = self.get_huffman_header(payload.shape[0], "txt", symbol_frequency_dict)
     
         else:
             #added the functionality to make monotone, tested and works
@@ -87,7 +86,6 @@ class Source:
         for i in range(0,cmpressed_string_len):
             compressed_bits_list.append(compressed_string[i])
 
-        print compressed_bits_list
         compresssed_bit_array = numpy.array(compressed_bits_list)
         return compresssed_bit_array, symbol_frequency_dict
     
@@ -125,6 +123,29 @@ class Source:
         bits = np.unpackbits(array) 
         np.set_printoptions(threshold='nan')
         return bits
+
+    def get_huffman_header(self, payload_length, srctype, frequency_map):
+        headerstr = ""
+        if srctype == "img":
+            headerstr += "01"
+        else:
+            headerstr += "10"
+        headerstr += bin(payload_length)[2:].zfill(16)
+        # NOTE THAT THE HEADER IS 2 BITS TO ENCODE FILE TYPE
+        # THEN 16 BITS FOR PAYLOAD LENGTH
+        # THEN 160 BITS ENCODING THE SYMBOL FREQUENCIES
+        # SYMBOLS AND FREQUENCIES ARE STORED TOGETHER IN 10 TOTAL BITS FOR EACH SYMBOL FREQUENCY PAIR
+        # FIRST FOUR BITS ENCODE THE SYMBOL INT VAL, LAST 6 BITS ENCODE THE FREQUENCY OF THE SYMBOL. 
+        for key in frequency_map:
+            code_word_str = str(bin(frequency_map[key])[2:].zfill(6))
+            key_val_str = str(bin(key)[2:].zfill(4))
+            headerstr += (key_val_str + code_word_str)
+
+        header = np.fromstring(headerstr, dtype=np.uint8)
+        header[:] = [x - 48 for x in header]
+        print "header = " 
+        print header
+        return header
 
     def get_header(self, payload_length, srctype): 
         # Given the payload length and the type of source 
