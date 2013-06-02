@@ -9,9 +9,11 @@ import heapq
 class node(object):
     left = None
     right = None
-    def __init__(self, left, right):
+    node_id = 0
+    def __init__(self, left, right, curr_id):
         self.left = left
         self.right = right
+        self.node_id = curr_id
     def children(self):
         return self.left, self.right
 
@@ -22,13 +24,34 @@ def build_huffman_tree(symbol_frequencies_dict):
         if symbol_frequencies_dict[key] != 0:
             pq.append(curr)
 
-    heapq.heapify(pq) # this now makes pq an ordered list of (num occurences, symbol value) tuples. 
+    heapq.heapify(pq) # this now makes pq an ordered list of (num occurences, symbol value) tuples.
+    count = 1 
     while 1:
         if len(pq) == 1:
             break
         left = heapq.heappop(pq)
         right = heapq.heappop(pq)
-        super_node = node(left, right)
+        if left[0] > right[0]:
+            temp = right
+            right = left
+            left = temp
+        if (left[0] == right[0]) and ((type(left[1]) == int) and (type(right[1]) == int)):
+            if left[1] > right[1]:
+                temp = left
+                left = right
+                right = temp
+        if (type(left[1]) == int) and (type(right[1]) != int):
+            temp = right
+            right = left
+            left = temp
+        if (left[0] == right[0] and ((type(left[1]) != int) and (type(right[1]) != int))):
+            if left[1].node_id > right[1].node_id:
+                temp = left
+                left = right
+                right = temp
+            
+        super_node = node(left, right, count)
+        count = count + 1
         heapq.heappush(pq, (left[0] + right[0], super_node))
 
     return heapq.heappop(pq)

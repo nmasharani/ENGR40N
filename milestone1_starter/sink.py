@@ -41,8 +41,8 @@ class Sink:
         
         header = recd_bits[0:18]
         src_type, payloadLength = self.read_type_size(header)
-        bits = recd_bits[18:18 + payloadLength] #truncate based on size
         if src_type == "txt":
+            bits = recd_bits[18:18 + payloadLength + 160]
             header_symbol_stats = bits[0:160]
             frequency_map = self.read_stat(header_symbol_stats)
             encoded_bits = bits[160:]
@@ -51,6 +51,7 @@ class Sink:
             print "Received the following text: "
             print text
         elif src_type == "img":
+            bits = recd_bits[18:18 + payloadLength + 160] #truncate based on size
             header_symbol_stats = bits[0:160]
             encoded_bits = bits[160:]
             frequency_map = self.read_stat(header_symbol_stats)
@@ -58,6 +59,7 @@ class Sink:
             print "Received Image"
             self.image_from_bits(bits, "rcd-image.png", payloadLength)
         else:
+            bits = recd_bits[18:18 + payloadLength] #truncate based on size
             print "Received the following monotone signal: "
             print bits #monotone
         
@@ -67,9 +69,6 @@ class Sink:
     def huffman_decode(self, frequency_map, encoded_bits):
         huffman_tree_root = common_srcsink.build_huffman_tree(frequency_map)
         codeword_map = common_srcsink.build_codeword_map(huffman_tree_root)
-        print "sink codeword map"
-        for key in codeword_map:
-            print "key = " + str(key) + " and val = " + str(codeword_map[key])
 
         #builds the decode map by reversing the key value pairs
         decode_map = {}
