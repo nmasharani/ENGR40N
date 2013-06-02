@@ -59,7 +59,6 @@ def build_huffman_tree(symbol_frequencies_dict):
 def walk_tree(curr_node, curr_code, codeword_map):
     if type(curr_node[1]) == int:
         symbol_val = curr_node[1]
-        print symbol_val
         codeword_map[symbol_val] = curr_code
     else:
         left, right = curr_node[1].children()

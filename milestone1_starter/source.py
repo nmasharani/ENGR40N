@@ -22,24 +22,27 @@ class Source:
         if self.fname is not None:
             if self.fname.endswith('.png') or self.fname.endswith('.PNG'):
                 pre_payload = self.bits_from_image(self.fname)
+                source_bits = pre_payload
                 payload, symbol_frequency_dict = self.huffman_encode(pre_payload)
                 header = self.get_huffman_header(payload.shape[0], "img", symbol_frequency_dict) #note that shape[0] returns the length of the payload array. 
                 # refer to http://stackoverflow.com/questions/10200268/python-what-does-shape-do-in-for-i-in-rangey-shape0 if necessary for shape[0]
             else:           
                 pre_payload = self.text2bits(self.fname)
+                source_bits = pre_payload
                 payload, symbol_frequency_dict = self.huffman_encode(pre_payload) 
                 header = self.get_huffman_header(payload.shape[0], "txt", symbol_frequency_dict)
     
         else:
             #added the functionality to make monotone, tested and works
             payload = np.ones(self.monotone, dtype=np.uint8)
+            source_bits = payload
             header = self.get_header(self.monotone, "mon")
                 
         #this makes the databits to be the header + payload, tested and works
         databits = np.append(header, payload);
         #process is now going to return the orignial source bits(payload) and then
         # return the header+huffman encoded bits as well. 
-        return payload, databits 
+        return source_bits, databits 
 
     def huffman_encode(self, original_payload):
         #initialize the dictionary to zro for all possible symbols, where the symblos are the keys in the dictionary, listed under their integer equivalents (ie 1111 would be listed under 15)
@@ -63,9 +66,6 @@ class Source:
         # and return a dictionary mapping symbols (4 bit strings as int values) to codeword strings. 
         huffman_tree_root = common.build_huffman_tree(symbol_frequency_dict)
         codeword_map = common.build_codeword_map(huffman_tree_root)
-        print "source codeword map"
-        for key in codeword_map:
-            print "key = " + str(key) + " and val = " + str(codeword_map[key]) 
 
         #now I compress the orignial bit string by replacing every 4 bit symbol
         # with its corresponding huffman code_word

@@ -83,20 +83,19 @@ class Sink:
             if ((curr_str in decode_map) == True):
                 symbol_val = decode_map[curr_str]
                 symbol_str = str(bin(symbol_val)[2:].zfill(4))
-                print symbol_str
                 decoded_str += symbol_str
                 curr_str = ""
 
         decoded_bits = np.fromstring(decoded_str, dtype=np.uint8)
         decoded_bits[:] = [x - 48 for x in decoded_bits]
-        print "recieived decoded bits:"
-        print decoded_bits
-        print ""
         return decoded_bits
             
         
     def read_stat(self, stats):
         frequency_map = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
+        print '\tRecieved frequency stats in header: ', stats
+        print ""
+        print ""
         count = 0
         bitstring =""
         for bit in stats:
