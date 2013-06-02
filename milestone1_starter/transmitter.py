@@ -55,3 +55,6 @@ class Transmitter:
         Calls modulation function. No need to touch it.
         '''
         return common.modulate(self.fc, self.samplerate, samples)
+
+    def encode(self, databits):
+        coded_header = 

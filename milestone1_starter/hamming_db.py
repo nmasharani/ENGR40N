@@ -79,8 +79,18 @@ def gen_lookup(cc_len):
     k = parameters[index][1]
     
     # Reshape G:
+    # k = num rows
+    # n = num columns
 
-    return n, k, index, G
+    
+
+    return n, k, index, reshape(index, n, k)
+
+def reshape(index, n, k):
+    gen_matrix = [generating_matrices[index][i * n: i * n + n] for i in range(0, k)]
+    G = [numpy.concatenate((gen_matrix[i][n-k:n], gen_matrix[i][0:n-k]), axis=0) for i in range(0, k)]
+    return numpy.array(G)
+
 
 def parity_lookup(index):
     '''
@@ -94,13 +104,29 @@ def parity_lookup(index):
     is, because containing index is efficient than containing n in the header.
     The decoder reads the header to pick the right parity check matrix.
     ''' 
-    G = generating_matrices[index]
     n = parameters[index][0]
     k = parameters[index][1]
     
     # Reshape G, extract A and compute H:
 
-    return n, k, H
+    G = reshape(index, n, k)
+
+    A = [G[i][k:n] for i in range(0,k)]
+    AT = numpy.transpose(A)
+
+    I = numpy.identity(n-k, dtype=int)
+
+    H = [numpy.concatenate((AT[i], I[i]), axis=0) for i in range(0,n-k)]
+
+    return n, k, numpy.array(H)
+
+'''
+n, k, index, G = gen_lookup(7)
+print G
+
+n, k, H = parity_lookup(index)
+print H
+'''
 
 
 
