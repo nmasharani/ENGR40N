@@ -17,8 +17,17 @@ class Source:
         self.fname = filename
         print 'Source: '
 
+
+
+
+
     def process(self):
         # Form the databits, from the filename 
+        # Notes:
+        #1. pre_payload = the oringinal, uncompressed source bits
+        #2. payload = the compressed bits that will be transmitted
+        #3. symbol_frequency_dict = the dictionary mapping symbol values to frequencies
+        #4. header = the header for the transmitted bits. if image or text, 
         if self.fname is not None:
             if self.fname.endswith('.png') or self.fname.endswith('.PNG'):
                 pre_payload = self.bits_from_image(self.fname)
@@ -44,6 +53,11 @@ class Source:
         # return the header+huffman encoded bits as well. 
         return source_bits, databits 
 
+
+
+
+
+
     def huffman_encode(self, original_payload):
         #initialize the dictionary to zro for all possible symbols, where the symblos are the keys in the dictionary, listed under their integer equivalents (ie 1111 would be listed under 15)
         symbol_frequency_dict = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
@@ -64,6 +78,9 @@ class Source:
 
         #have the frequencies, now I need to build the huffman encoding
         # and return a dictionary mapping symbols (4 bit strings as int values) to codeword strings. 
+        print "source: frequency map:"
+        for key in symbol_frequency_dict:
+            print "key = " + str(key) + " and val = " + str(symbol_frequency_dict[key])
         huffman_tree_root = common.build_huffman_tree(symbol_frequency_dict)
         codeword_map = common.build_codeword_map(huffman_tree_root)
 
@@ -87,12 +104,18 @@ class Source:
         compressed_bits_list = list([])
         cmpressed_string_len = len(compressed_string)
         for i in range(0,cmpressed_string_len):
-            bit_val = int(compressed_string[i])
+            bit_val = int(compressed_string[i], 2)
             compressed_bits_list.append(bit_val)
 
         compresssed_bit_array = np.array(compressed_bits_list)
         return compresssed_bit_array, symbol_frequency_dict
     
+
+
+
+
+
+
     def text2bits(self, filename):
         f = open(filename, 'r')
         fileStr = f.read()
@@ -101,6 +124,13 @@ class Source:
         ascii = np.array([ord(c) for c in fileStr], dtype=np.uint8)
         bits = np.unpackbits(ascii)
         return bits
+
+
+
+
+
+
+
 
     def bits_from_image(self, filename):
         img = Image.open(filename)
@@ -128,6 +158,12 @@ class Source:
         np.set_printoptions(threshold='nan')
         return bits
 
+
+
+
+
+
+
     def get_huffman_header(self, payload_length, srctype, frequency_map):
         headerstr = ""
         if srctype == "img":
@@ -141,7 +177,7 @@ class Source:
         # SYMBOLS AND FREQUENCIES ARE STORED TOGETHER IN 10 TOTAL BITS FOR EACH SYMBOL FREQUENCY PAIR
         # FIRST FOUR BITS ENCODE THE SYMBOL INT VAL, LAST 6 BITS ENCODE THE FREQUENCY OF THE SYMBOL. 
         for key in frequency_map:
-            code_word_str = str(bin(frequency_map[key])[2:].zfill(6))
+            code_word_str = str(bin(frequency_map[key])[2:].zfill(10))
             key_val_str = str(bin(key)[2:].zfill(4))
             headerstr += (key_val_str + code_word_str)
 
@@ -150,6 +186,12 @@ class Source:
         print "header = " 
         print header
         return header
+
+
+
+
+
+
 
     def get_header(self, payload_length, srctype): 
         # Given the payload length and the type of source 

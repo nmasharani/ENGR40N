@@ -42,18 +42,18 @@ class Sink:
         header = recd_bits[0:18]
         src_type, payloadLength = self.read_type_size(header)
         if src_type == "txt":
-            bits = recd_bits[18:18 + payloadLength + 160]
-            header_symbol_stats = bits[0:160]
+            bits = recd_bits[18:18 + payloadLength + 224]
+            header_symbol_stats = bits[0:224]
             frequency_map = self.read_stat(header_symbol_stats)
-            encoded_bits = bits[160:]
+            encoded_bits = bits[224:]
             bits = self.huffman_decode(frequency_map, encoded_bits)
             text = self.bits2text(bits)
             print "Received the following text: "
             print text
         elif src_type == "img":
-            bits = recd_bits[18:18 + payloadLength + 160] #truncate based on size
-            header_symbol_stats = bits[0:160]
-            encoded_bits = bits[160:]
+            bits = recd_bits[18:18 + payloadLength + 224] #truncate based on size
+            header_symbol_stats = bits[0:224]
+            encoded_bits = bits[224:]
             frequency_map = self.read_stat(header_symbol_stats)
             bits = self.huffman_decode(frequency_map, encoded_bits)
             print "Received Image"
@@ -71,7 +71,7 @@ class Sink:
         codeword_map = common_srcsink.build_codeword_map(huffman_tree_root)
 
         #builds the decode map by reversing the key value pairs
-        decode_map = {}
+        decode_map = {} #{"01":0, "00101":6, "0000":7, "00111":8, "0001":9, "00100":12, "00110":13, "1":15}
         for key in codeword_map:
             decode_map[codeword_map[key]] = key
 
@@ -102,9 +102,9 @@ class Sink:
             count = count + 1
             curr_bit = str(bit)
             bitstring += curr_bit
-            if count == 10:
+            if count == 14:
                 symbol_str = bitstring[0:4]
-                frequency_str = bitstring[4:10]
+                frequency_str = bitstring[4:14]
                 symbol_val = int(symbol_str, 2)
                 frequency_val = int(frequency_str, 2)
                 frequency_map[symbol_val] = frequency_val
