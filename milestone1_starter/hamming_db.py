@@ -5,6 +5,7 @@ import common_txrx_mil3
 import binascii
 import sys
 
+#generating_matrices is an array of numpy arrays. 
 generating_matrices = [numpy.array([1, 1, 1]),
                        numpy.array([1,    1,    0,    1,    0,    0,    0,
                                     0,    1,    1,    0,    1,    0,    0,

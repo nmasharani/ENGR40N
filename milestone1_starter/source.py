@@ -49,6 +49,10 @@ class Source:
                 
         #this makes the databits to be the header + payload, tested and works
         databits = np.append(header, payload);
+        print "1. Original source data bits length = " + str(len(source_bits))
+        print "2. Compressed data bits length = " + str(len(payload))
+        compression_rate = (1.0 * len(payload)) / (1.0 * len(source_bits))
+        print "3. Compression rate = " + str(compression_rate)
         #process is now going to return the orignial source bits(payload) and then
         # return the header+huffman encoded bits as well. 
         return source_bits, databits 
@@ -78,9 +82,6 @@ class Source:
 
         #have the frequencies, now I need to build the huffman encoding
         # and return a dictionary mapping symbols (4 bit strings as int values) to codeword strings. 
-        print "source: frequency map:"
-        for key in symbol_frequency_dict:
-            print "key = " + str(key) + " and val = " + str(symbol_frequency_dict[key])
         huffman_tree_root = common.build_huffman_tree(symbol_frequency_dict)
         codeword_map = common.build_codeword_map(huffman_tree_root)
 
@@ -177,7 +178,7 @@ class Source:
         # SYMBOLS AND FREQUENCIES ARE STORED TOGETHER IN 10 TOTAL BITS FOR EACH SYMBOL FREQUENCY PAIR
         # FIRST FOUR BITS ENCODE THE SYMBOL INT VAL, LAST 6 BITS ENCODE THE FREQUENCY OF THE SYMBOL. 
         for key in frequency_map:
-            code_word_str = str(bin(frequency_map[key])[2:].zfill(10))
+            code_word_str = str(bin(frequency_map[key])[2:].zfill(14))
             key_val_str = str(bin(key)[2:].zfill(4))
             headerstr += (key_val_str + code_word_str)
 

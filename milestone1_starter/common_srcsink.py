@@ -69,8 +69,6 @@ def build_codeword_map(root_node):
     codeword_map = {}
     begin_string = ""
     walk_tree(root_node, begin_string, codeword_map)
-    for key in codeword_map:
-        print "key = " + str(key) + " and val = " + str(codeword_map[key])
     return codeword_map
     return codeword_map
 
