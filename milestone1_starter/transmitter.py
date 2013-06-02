@@ -9,7 +9,10 @@ class Transmitter:
         self.one = one
         self.spb = spb
         self.silence = silence
+        print ""
+        print ""
         print 'Transmitter: '
+        print ""
     def add_preamble(self, databits):
         '''
         Prepend the array of source bits with silence bits and preamble bits

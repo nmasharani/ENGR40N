@@ -6,11 +6,14 @@ import Image
 from graphs import *
 import binascii
 import random
+import numpy as np
 
 
 class Sink:
     def __init__(self):
         # no initialization required for sink 
+        print ""
+        print ""
         print 'Sink:'
 
     def process(self, recd_bits):
@@ -36,21 +39,79 @@ class Sink:
         #5. convert the payload array of 1's and 0's to image or text
         # based on the header info.
         
-        header = recd_bits[0:34]
-        type, payloadLength = self.read_header(header)
-        bits = recd_bits[34:34 + payloadLength] #truncate based on size
-        if type == "txt":
+        header = recd_bits[0:18]
+        src_type, payloadLength = self.read_type_size(header)
+        if src_type == "txt":
+            bits = recd_bits[18:18 + payloadLength + 288]
+            header_symbol_stats = bits[0:288]
+            frequency_map = self.read_stat(header_symbol_stats)
+            encoded_bits = bits[288:]
+            bits = self.huffman_decode(frequency_map, encoded_bits)
             text = self.bits2text(bits)
+            print "Received the following text: "
             print text
-        elif type == "img":
+        elif src_type == "img":
+            bits = recd_bits[18:18 + payloadLength + 288] #truncate based on size
+            header_symbol_stats = bits[0:288]
+            encoded_bits = bits[288:]
+            frequency_map = self.read_stat(header_symbol_stats)
+            bits = self.huffman_decode(frequency_map, encoded_bits)
+            print "Received Image"
             self.image_from_bits(bits, "rcd-image.png", payloadLength)
         else:
+            bits = recd_bits[18:18 + payloadLength] #truncate based on size
+            print "Received the following monotone signal: "
             print bits #monotone
         
-        print header
-
+        print ""
         return bits
+
+    def huffman_decode(self, frequency_map, encoded_bits):
+        huffman_tree_root = common_srcsink.build_huffman_tree(frequency_map)
+        codeword_map = common_srcsink.build_codeword_map(huffman_tree_root)
+
+        #builds the decode map by reversing the key value pairs
+        decode_map = {} #{"01":0, "00101":6, "0000":7, "00111":8, "0001":9, "00100":12, "00110":13, "1":15}
+        for key in codeword_map:
+            decode_map[codeword_map[key]] = key
+
+        #here is where we do the decoding
+        curr_str = ""
+        decoded_str = ""
+        for bit in encoded_bits:
+            curr_str += str(bit)
+            if ((curr_str in decode_map) == True):
+                symbol_val = decode_map[curr_str]
+                symbol_str = str(bin(symbol_val)[2:].zfill(4))
+                decoded_str += symbol_str
+                curr_str = ""
+
+        decoded_bits = np.fromstring(decoded_str, dtype=np.uint8)
+        decoded_bits[:] = [x - 48 for x in decoded_bits]
+        return decoded_bits
+            
         
+    def read_stat(self, stats):
+        frequency_map = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
+        print '\tRecieved frequency stats in header: ', stats
+        print ""
+        print ""
+        count = 0
+        bitstring =""
+        for bit in stats:
+            count = count + 1
+            curr_bit = str(bit)
+            bitstring += curr_bit
+            if count == 18:
+                symbol_str = bitstring[0:4]
+                frequency_str = bitstring[4:18]
+                symbol_val = int(symbol_str, 2)
+                frequency_val = int(frequency_str, 2)
+                frequency_map[symbol_val] = frequency_val
+                count = 0
+                bitstring = ""
+
+        return frequency_map
         
         
     #return rcd_payload
@@ -76,19 +137,14 @@ class Sink:
 
         return  text
 
-            
-            
     def image_from_bits(self, bits,filename, payloadLength):
         # Convert the received payload to an image and save it
 
         # No return value required.
 
         img = Image.new("L", (32, 32))
-
         # need to get bit string into format [(r, g, b), (r, g, b), (r, g, b)]
-
         data = list([])
-
         count = 0
         intStr = ""
 
@@ -114,17 +170,15 @@ class Sink:
 
                 count = 0
                 intStr = ""
-
         
         img.putdata(data)
-
         img.save(filename)
 
         pass 
 
             
             
-    def read_header(self, header_bits): 
+    def read_type_size(self, header_bits): 
         # Given the header bits, compute the payload length
         # and source type (compatible with get_header on source)
         #this funtion is now working LMP
@@ -132,7 +186,7 @@ class Sink:
         # then convert the remaining payload size bits to string
         # convert that string to an int
         typeBits = header_bits[0:2]
-        payloadLengthInBinary = header_bits[2:34]
+        payloadLengthInBinary = header_bits[2:18]
         if typeBits[0] == 1:
             srctype = "txt"
         elif typeBits[1] == 1:
@@ -145,7 +199,9 @@ class Sink:
             bitStr = str(bit)
             payloadLengthString += bitStr
         payload_length = int(payloadLengthString, 2);
+        print ""
         print '\tRecd header: ', header_bits
         print '\tLength from header: ', payload_length
         print '\tSource type: ', srctype
+        print ""
         return srctype, payload_length
