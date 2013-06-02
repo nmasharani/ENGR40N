@@ -48,7 +48,9 @@ generating_matrices = [numpy.array([1, 1, 1]),
                                      0,    1,    1,    0,    1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1,    0,    0,
                                      1,    0,    0,    1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1,    0,
                                      0,    1,    0,    0,    1,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    1])]
-
+# paramaters in the form [n,k] 
+# where n is the length of the codeword (databits + parity bits),
+# and k is the length of the databits
 parameters = [[3,1],[7,4],[15,11],[31,26]]
 
 

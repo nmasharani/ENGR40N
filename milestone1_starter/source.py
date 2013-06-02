@@ -178,9 +178,10 @@ class Source:
         # SYMBOLS AND FREQUENCIES ARE STORED TOGETHER IN 10 TOTAL BITS FOR EACH SYMBOL FREQUENCY PAIR
         # FIRST FOUR BITS ENCODE THE SYMBOL INT VAL, LAST 6 BITS ENCODE THE FREQUENCY OF THE SYMBOL. 
         for key in frequency_map:
-            code_word_str = str(bin(frequency_map[key])[2:].zfill(14))
-            key_val_str = str(bin(key)[2:].zfill(4))
-            headerstr += (key_val_str + code_word_str)
+            frequency_str = str(bin(frequency_map[key])[2:].zfill(14))
+            #key_val_str = str(bin(key)[2:].zfill(4))
+            #headerstr += (key_val_str + frequency_str)
+            headerstr += frequency_str
 
         header = np.fromstring(headerstr, dtype=np.uint8)
         header[:] = [x - 48 for x in header]

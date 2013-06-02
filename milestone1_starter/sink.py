@@ -42,18 +42,18 @@ class Sink:
         header = recd_bits[0:18]
         src_type, payloadLength = self.read_type_size(header)
         if src_type == "txt":
-            bits = recd_bits[18:18 + payloadLength + 288]
-            header_symbol_stats = bits[0:288]
+            bits = recd_bits[18:18 + payloadLength + 224]
+            header_symbol_stats = bits[0:224]
             frequency_map = self.read_stat(header_symbol_stats)
-            encoded_bits = bits[288:]
+            encoded_bits = bits[224:]
             bits = self.huffman_decode(frequency_map, encoded_bits)
             text = self.bits2text(bits)
             print "Received the following text: "
             print text
         elif src_type == "img":
-            bits = recd_bits[18:18 + payloadLength + 288] #truncate based on size
-            header_symbol_stats = bits[0:288]
-            encoded_bits = bits[288:]
+            bits = recd_bits[18:18 + payloadLength + 224] #truncate based on size
+            header_symbol_stats = bits[0:224]
+            encoded_bits = bits[224:]
             frequency_map = self.read_stat(header_symbol_stats)
             bits = self.huffman_decode(frequency_map, encoded_bits)
             print "Received Image"
@@ -98,18 +98,20 @@ class Sink:
         print ""
         count = 0
         bitstring =""
+        symbol_val = 0
         for bit in stats:
             count = count + 1
             curr_bit = str(bit)
             bitstring += curr_bit
-            if count == 18:
-                symbol_str = bitstring[0:4]
-                frequency_str = bitstring[4:18]
-                symbol_val = int(symbol_str, 2)
+            if count == 14:
+                #symbol_str = bitstring[0:4]
+                frequency_str = bitstring[0:14]
+                #symbol_val = int(symbol_str, 2)
                 frequency_val = int(frequency_str, 2)
                 frequency_map[symbol_val] = frequency_val
                 count = 0
                 bitstring = ""
+                symbol_val = symbol_val + 1
 
         return frequency_map
         
