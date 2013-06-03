@@ -5,6 +5,7 @@ import scipy.cluster.vq
 import common_txrx as common
 from numpy import linalg as LA
 import receiver_mil3
+import hamming_db as hamming
 
 class Receiver:
     def __init__(self, carrier_freq, samplerate, spb):
@@ -178,3 +179,99 @@ class Receiver:
 
     def demodulate(self, samples):
         return common.demodulate(self.fc, self.samplerate, samples)
+
+    def decode(self, rcd_bits):
+        # decode the header
+        header_len, header_index = common.get_coding_header_info()
+        coded_header = rcd_bits[0:header_len * 3]
+        header = self.hamming_decoding(coded_header, header_index, True)
+
+        print "received coding header " + str(header)
+
+        # Given the header bits, compute the length of coded bits
+        # and encoding scheme
+
+        index_bits = header[30:]
+        length_bits = header[0:30]
+
+        index_str = ""
+        for bit in index_bits:
+            index_str += str(bit)
+        index = int(index_str, 2)
+
+        length_str = ""
+        for bit in length_bits:
+            length_str += str(bit)
+        length = int(length_str, 2)
+
+        n = hamming.parameters[index][0]
+        k = hamming.parameters[index][1]
+
+        databits = self.hamming_decoding(rcd_bits[header_len * 3:], index, False)
+
+        print "channel coding rate: " + str(k * 1.0 / n)
+
+        return databits
+
+    def hamming_decoding(self, coded_bits, index, is_header):
+
+        n,k,H = hamming.parity_lookup(index)
+
+        if len(coded_bits) % n != 0:
+            zeros = (n - (len(coded_bits) % n)) * [0]
+            coded_bits = numpy.concatenate((coded_bits, zeros), axis=0)
+
+        # split coded bits into chunks of size n (k message + (n-k) parity)
+        len_coded_bits = len(coded_bits)
+        coded_bits_split = [coded_bits[i:i+n] for i in range(0,len_coded_bits,n)]
+
+        len_coded_bits_split = len(coded_bits_split)
+
+        decoded_bits = list([])
+
+        zero_syndrome = numpy.zeros(n-k, dtype=int)
+        HT = numpy.transpose(H)
+
+        num_errors = 0
+
+        for i in range(0, len_coded_bits_split):
+            syndrome = numpy.dot(H, numpy.transpose(coded_bits_split[i]))
+            syndrome[:] = [x % 2 for x in syndrome]
+            # syndrome is all zeros: no errors
+            if numpy.array_equal(syndrome, zero_syndrome):
+                decoded_bits.append(coded_bits_split[i][0:k])
+
+
+            # if there's an error
+            else:
+                error_loc = -1
+                # figure out which column of H the syndrome corresponds with
+                for j in range(0, k):
+                    if numpy.array_equal(HT[j], syndrome):
+                        error_loc = j
+                        break
+                # only care about errors in the message bits, not in the parity bits
+                if error_loc < 0:
+                    decoded_bits.append(coded_bits_split[i][0:k])
+                
+                # decode by flipping the correct bit
+                else:
+                    cur_decoded = coded_bits_split[i][0:k]
+
+                    if (cur_decoded[error_loc] == 1):
+                        cur_decoded[error_loc] = 0
+                    else:
+                        cur_decoded[error_loc] = 1
+
+                    decoded_bits.append(cur_decoded)
+                    num_errors += 1
+
+
+        if (is_header):
+            print "header errors corrected: " + str(num_errors)
+        else:
+            print "errors corrected: " + str(num_errors)
+
+        decoded_bits = numpy.array(decoded_bits)
+
+        return decoded_bits.flatten()

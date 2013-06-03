@@ -41,5 +41,5 @@ def get_Preamble ():
    1,1,0,1,1,0,1,0,0,1,0,0,0,1,0,0,1,1,0,0,1,0,1,0,1,0,0,0,0,0,0]
 	return preamble
 
-# get preamble bits
-# get preamble samples
+def get_coding_header_info():
+	return 32, 0

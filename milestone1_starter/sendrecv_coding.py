@@ -103,10 +103,20 @@ if __name__ == '__main__':
     # instantiate and run the transmitter block
     xmitter = Transmitter(fc, opt.samplerate, opt.one, opt.spb, opt.silence, opt.cc_len)
     coded_bits = xmitter.encode(databits)
+<<<<<<< HEAD
     coded_bits_with_preamble = xmitter.add_preamble(coded_bits)
     samples = xmitter.bits_to_samples(coded_bits_with_preamble)
     mod_samples = xmitter.modulate(samples)
 
+=======
+
+    coded_bits_with_preamble = xmitter.add_preamble(coded_bits)
+
+    samples = xmitter.bits_to_samples(coded_bits_with_preamble)
+
+    mod_samples = xmitter.modulate(samples)
+    
+>>>>>>> e7f14b12b28b3c27ffb7afdc5dc0534cfd2c7b3b
 ####################################    
     # create channel instance
     if opt.bypass:
@@ -128,11 +138,21 @@ if __name__ == '__main__':
     # make receiver
     r = Receiver(fc, opt.samplerate, opt.spb)
     demod_samples = r.demodulate(samples_rx)
+<<<<<<< HEAD
     one, zero, thresh = r.detect_threshold(demod_samples)
     barker_start = r.detect_preamble(demod_samples, thresh, one)
     rcdbits = r.demap_and_check(demod_samples, barker_start)
     decoded_bits = r.decode(rcdbits)
 
+=======
+    
+    one, zero, thresh = r.detect_threshold(demod_samples)
+    barker_start = r.detect_preamble(demod_samples, thresh, one)
+    rcdbits = r.demap_and_check(demod_samples, barker_start)
+
+    decoded_bits = r.decode(rcdbits)
+    
+>>>>>>> e7f14b12b28b3c27ffb7afdc5dc0534cfd2c7b3b
     # push into sink
     sink = Sink()
     rcd_payload = sink.process(decoded_bits)
