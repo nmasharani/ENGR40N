@@ -121,5 +121,15 @@ def parity_lookup(index):
 
     return n, k, numpy.array(H)
 
-    
+'''
+n,k,index,G = gen_lookup(7)
+
+print G
+
+for i in range(0, 16):
+    a = numpy.array([i], dtype=numpy.uint8)
+    bits = numpy.unpackbits(a)
+    bits = bits[4:]
+    print "code word = " + str(numpy.dot(bits, G))
+'''
 

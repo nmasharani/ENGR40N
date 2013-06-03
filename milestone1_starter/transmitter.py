@@ -120,6 +120,7 @@ class Transmitter:
         for i in range(0, databits_k_len):
 
             coded_fragment = np.dot(databits_k[i][:], G)
+            coded_fragment[:] = [x % 2 for x in coded_fragment]
 
             coded_bits.append(coded_fragment)
 

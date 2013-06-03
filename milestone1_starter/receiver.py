@@ -236,7 +236,7 @@ class Receiver:
 
         for i in range(0, len_coded_bits_split):
             syndrome = numpy.dot(H, numpy.transpose(coded_bits_split[i]))
-            #syndrome[:] = [x % 2 for x in syndrome]
+            syndrome[:] = [x % 2 for x in syndrome]
             # syndrome is all zeros: no errors
             if numpy.array_equal(syndrome, zero_syndrome):
                 decoded_bits.append(coded_bits_split[i][0:k])
