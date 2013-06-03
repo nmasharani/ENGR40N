@@ -57,22 +57,6 @@ def lpfilter(samples_in, omega_cut):
 
   demod_samples = numpy.convolve(to_be_filtered, lpf)
 
-  '''
-  for n in range(0, sample_len-lpf_len):
-    convolve_sum = numpy.dot(to_be_filtered[n:n + lpf_len], lpf[::-1])
-    demod_samples[n] = convolve_sum
-  '''
-
-
-
-  '''
-  for n in range(0, sample_len):
-    convolve_sum = 0.0
-    for k in range(n-(lpf_len-1), n):
-      if k >= 0:
-        convolve_sum += to_be_filtered[k] * lpf[n - k]
-
-    demod_samples[n] = convolve_sum
-  '''
+ 
   demod_samples_mag = [abs(x) for x in demod_samples]
   return numpy.array(demod_samples_mag)

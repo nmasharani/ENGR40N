@@ -217,6 +217,10 @@ class Receiver:
 
         n,k,H = hamming.parity_lookup(index)
 
+        if len(coded_bits) % n != 0:
+            zeros = (n - (len(coded_bits) % n)) * [0]
+            coded_bits = numpy.concatenate((coded_bits, zeros), axis=0)
+
         # split coded bits into chunks of size n (k message + (n-k) parity)
         len_coded_bits = len(coded_bits)
         coded_bits_split = [coded_bits[i:i+n] for i in range(0,len_coded_bits,n)]
@@ -232,7 +236,7 @@ class Receiver:
 
         for i in range(0, len_coded_bits_split):
             syndrome = numpy.dot(H, numpy.transpose(coded_bits_split[i]))
-            syndrome[:] = [x % 2 for x in syndrome]
+            #syndrome[:] = [x % 2 for x in syndrome]
             # syndrome is all zeros: no errors
             if numpy.array_equal(syndrome, zero_syndrome):
                 decoded_bits.append(coded_bits_split[i][0:k])
@@ -240,8 +244,6 @@ class Receiver:
 
             # if there's an error
             else:
-                print "syndrome " + str(syndrome)
-
                 error_loc = -1
                 # figure out which column of H the syndrome corresponds with
                 for j in range(0, k):
@@ -254,14 +256,13 @@ class Receiver:
                 
                 # decode by flipping the correct bit
                 else:
-                    print "syndrome = " + str(syndrome)
                     cur_decoded = coded_bits_split[i][0:k]
-                    
+
                     if (cur_decoded[error_loc] == 1):
                         cur_decoded[error_loc] = 0
                     else:
                         cur_decoded[error_loc] = 1
-                    
+
                     decoded_bits.append(cur_decoded)
                     num_errors += 1
 

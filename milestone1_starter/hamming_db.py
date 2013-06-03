@@ -121,11 +121,5 @@ def parity_lookup(index):
 
     return n, k, numpy.array(H)
 
-'''
-n, k, index, G = gen_lookup(7)
-print G
-
-n, k, H = parity_lookup(index)
-print H
-'''
+    
 
