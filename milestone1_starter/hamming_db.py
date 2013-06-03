@@ -116,6 +116,7 @@ def parity_lookup(index):
 
     I = numpy.identity(n-k, dtype=int)
 
+
     H = [numpy.concatenate((AT[i], I[i]), axis=0) for i in range(0,n-k)]
 
     return n, k, numpy.array(H)
@@ -127,6 +128,4 @@ print G
 n, k, H = parity_lookup(index)
 print H
 '''
-
-
 

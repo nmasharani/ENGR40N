@@ -53,6 +53,7 @@ class Source:
         print "2. Compressed data bits length = " + str(len(payload))
         compression_rate = (1.0 * len(payload)) / (1.0 * len(source_bits))
         print "3. Compression rate = " + str(compression_rate)
+        print "Total bits to send: " + str(len(databits))
         #process is now going to return the orignial source bits(payload) and then
         # return the header+huffman encoded bits as well. 
         return source_bits, databits 
@@ -185,8 +186,7 @@ class Source:
 
         header = np.fromstring(headerstr, dtype=np.uint8)
         header[:] = [x - 48 for x in header]
-        print "header = " 
-        print header
+        #print "header = " + str(header)
         return header
 
 
