@@ -45,6 +45,22 @@ def lpfilter(samples_in, omega_cut):
     else:
       lpf[n + L] = omega_cut / math.pi
 
+
+  # This is code that works. It's inconvenient because we're not supposed to use numpy.convolve
+  '''
+  sample_len = len(samples_in)
+  lpf_len = len(lpf)
+
+  to_be_filtered = sample_len * [0.0]
+
+  for n in range(0, sample_len):
+    to_be_filtered[n] = samples_in[n] * cmath.exp(complex(0, 2 * omega_cut * n))
+
+  # compute demodulated samples
+
+  demod_samples = numpy.convolve(to_be_filtered, lpf)
+  '''
+
   # compute demodulated samples
 
   demod_samples = convolve(numpy.array(samples_in), numpy.array(lpf), omega_cut)
@@ -53,6 +69,7 @@ def lpfilter(samples_in, omega_cut):
 
   return numpy.array(demod_samples_mag)
 
+# LUKE THIS IS THE FUNCTION I NEED HELP WITH. Thank you so much. 
 # this is a basic convolve function that works. 
 # it's super slow and is obviously not good for our purposes.
 def convolve(arr1, arr2, omega_cut):
@@ -61,6 +78,7 @@ def convolve(arr1, arr2, omega_cut):
   # so in this function, we must BOTH 
   #   a) multiply the received samples by e^(2j • omega_cut •n) 
   #                                      = cmath.exp(complex(0, 2 * omega_cut * n))
+  #      note that this depends on n and therefore must be done in a for loop (can't use numpy.multiply)
   #   b) convolve the multiplied received samples with the low pass filter
   # right now, I'm passing in the received samples as arr1, the lpf as arr2, and omega_cut as itself
 
