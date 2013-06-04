@@ -69,14 +69,11 @@ def lpfilter(samples_in, omega_cut):
 
   return numpy.array(demod_samples_mag)
 
-# LUKE THIS IS THE FUNCTION I NEED HELP WITH. Thank you so much. 
-# this is a basic convolve function that works. 
-# it's super slow and is obviously not good for our purposes.
 def convolve(arr1, arr2, omega_cut):
   # the equation we're trying to satisfy is:
-  # demod_samples[n] = (received[n]•e^(2j • omega_cut •n)) * lpf[n]
+  # demod_samples[n] = (received[n]*e^(2j * omega_cut * n)) convolved with lpf[n]
   # so in this function, we must BOTH 
-  #   a) multiply the received samples by e^(2j • omega_cut •n) 
+  #   a) multiply the received samples by e^(2j * omega_cut * n) 
   #                                      = cmath.exp(complex(0, 2 * omega_cut * n))
   #      note that this depends on n and therefore must be done in a for loop (can't use numpy.multiply)
   #   b) convolve the multiplied received samples with the low pass filter
@@ -85,9 +82,15 @@ def convolve(arr1, arr2, omega_cut):
   len_arr1 = len(arr1)
   len_arr2 = len(arr2)
 
+  arr1_modded = len_arr1 * [complex(0.0, 0.0)]
+
+  for n in range(0, len_arr1):
+    arr1_modded[n] = arr1[n] * cmath.exp(complex(0, 2 * omega_cut * n))
+
+
   len_result = len_arr1 + len_arr2 - 1
 
-  result = len_result * [0]
+  result = numpy.array(len_result * [complex(0.0,0.0)])
 
   # we have to iterate over n
   for n in range(0, len_result):
@@ -104,6 +107,29 @@ def convolve(arr1, arr2, omega_cut):
     # we ideally want to pad with zeros (0.0). But for some reason, I can't wrap my 
     # head around the math to do so. 
 
+    cur = []
+
+    if n - (len_arr2 -1) < 0:
+      cur = arr1_modded[0:n+1]
+      #print str(len(cur)) + str(len(arr2))
+      zeros = (len_arr2 - len(cur)) * [0.0]
+      #print str(len(zeros))
+      cur = numpy.concatenate((zeros,cur),axis=0)
+      #print "padded with zeros at beginning"
+      
+
+    else:
+      cur = arr1_modded[n - (len_arr2 -1): n+1]
+
+    if len(cur) < len_arr2:
+      #print str(len(cur)) + str(len(arr2))
+      zeros = (len_arr2 - len(cur)) * [0.0]
+      cur = numpy.concatenate((cur,zeros),axis=0)
+
+    cur = numpy.array(cur[::-1])
+
+
+    '''
     cursum = 0
 
     for k in range(0, len_arr2):
@@ -111,6 +137,10 @@ def convolve(arr1, arr2, omega_cut):
         cursum += arr2[k] * arr1[n-k]
 
     result[n] = cursum
+    '''
+
+    #print str(len(cur)) + str(len(arr2))
+    result[n] = numpy.sum(numpy.dot(cur, arr2))
 
   # return value should be a numpy array for best results
   return numpy.array(result)
@@ -118,12 +148,15 @@ def convolve(arr1, arr2, omega_cut):
   
 # this snippet of code shows that the current function is working
 '''
-arr1 = [0, 1, 0, 1, 0, 1]
-arr2 = [1, 1, 0]
+arr1 = [0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0]
+arr2 = [1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0]
 
 print numpy.convolve(arr1, arr2)
+
 print convolve(arr1, arr2, 0)
 '''
+
+
 
 
 
