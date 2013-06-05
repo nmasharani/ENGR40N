@@ -102,8 +102,8 @@ if __name__ == '__main__':
 
     # instantiate and run the transmitter block
     xmitter = Transmitter(fc, opt.samplerate, opt.one, opt.spb, opt.silence, opt.cc_len)
-    coded_bits = xmitter.encode(databits)
-    coded_bits_with_preamble = xmitter.add_preamble(coded_bits)
+    coded_bits = xmitter.encode(databits) #used for both versions
+    coded_bits_with_preamble = xmitter.add_preamble(coded_bits) #comment out encode, replace with data bits, testing mod and demod
     samples = xmitter.bits_to_samples(coded_bits_with_preamble)
     mod_samples = xmitter.modulate(samples)
 

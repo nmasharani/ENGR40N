@@ -15,6 +15,7 @@ class Source:
         # The initialization procedure of source object
         self.monotone = monotone
         self.fname = filename
+        print ""
         print 'Source: '
 
 
@@ -49,11 +50,11 @@ class Source:
                 
         #this makes the databits to be the header + payload, tested and works
         databits = np.append(header, payload);
-        print "1. Original source data bits length = " + str(len(source_bits))
-        print "2. Compressed data bits length = " + str(len(payload))
+        print "\t1. Original source data bits length = " + str(len(source_bits))
+        print "\t2. Compressed payload length = " + str(len(payload))
         compression_rate = (1.0 * len(payload)) / (1.0 * len(source_bits))
-        print "3. Compression rate = " + str(compression_rate)
-        print "Total bits to send: " + str(len(databits))
+        print "\t3. Compression rate = " + str(compression_rate)
+        print "\tTotal bits to send: " + str(len(databits))
         #process is now going to return the orignial source bits(payload) and then
         # return the header+huffman encoded bits as well. 
         return source_bits, databits 

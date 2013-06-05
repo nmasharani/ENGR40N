@@ -12,7 +12,6 @@ class Transmitter:
         self.silence = silence
         self.cc_len = cc_len
         print ""
-        print ""
         print 'Transmitter: '
         print ""
 
@@ -41,7 +40,8 @@ class Transmitter:
         # fill in your implementation
 
         preamble = common.get_Preamble()
-        print "\tSent preamble: " + str(preamble)
+        print "\tSent preamble: " 
+        print "\t" + str(preamble)
         databits_with_preamble = np.concatenate((np.zeros(self.silence), preamble, databits), axis=0)
         return databits_with_preamble
 

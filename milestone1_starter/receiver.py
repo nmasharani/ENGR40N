@@ -20,7 +20,6 @@ class Receiver:
         self.samplerate = samplerate
         self.spb = spb 
         print ""
-        print ""
         print 'Receiver: '
 
     def detect_threshold(self, demod_samples):
@@ -57,7 +56,7 @@ class Receiver:
                 energy_offset = i
                 break
 
-        print "energy offset " + str(energy_offset)
+        print "\tenergy offset " + str(energy_offset)
 
         if energy_offset < 0:
             print ""
@@ -97,8 +96,8 @@ class Receiver:
         maxindex = numpy.argmax(numpy.array(correlation))
 
         preamble_offset = maxindex
-        print "Max Correlation Value: " + str(correlation[maxindex])
-        print "Preamble offset: " + str(preamble_offset)
+        print "\tMax Correlation Value: " + str(correlation[maxindex])
+        print "\tPreamble offset: " + str(preamble_offset)
         #print preamble_offset
          # fill in the result of the cross-correlation check 
         
@@ -173,7 +172,8 @@ class Receiver:
                 #print bits[0:preamble_len]
                 #sys.exit(1)
 
-        print "Received Preamble: " + str(bits[0:preamble_len])
+        print "\tReceived Preamble: "
+        print "\t" + str(bits[0:preamble_len])
         print ""
         return bits[preamble_len:] # without preamble
 
@@ -186,7 +186,7 @@ class Receiver:
         coded_header = rcd_bits[0:header_len * 3]
         header = self.hamming_decoding(coded_header, header_index, True)
 
-        print "received coding header " + str(header)
+        print "\treceived coding header " + str(header)
 
         # Given the header bits, compute the length of coded bits
         # and encoding scheme
@@ -209,7 +209,7 @@ class Receiver:
 
         databits = self.hamming_decoding(rcd_bits[header_len * 3:], index, False)
 
-        print "channel coding rate: " + str(k * 1.0 / n)
+        print "\tchannel coding rate: " + str(k * 1.0 / n)
 
         return databits
 
@@ -268,9 +268,9 @@ class Receiver:
 
 
         if (is_header):
-            print "header errors corrected: " + str(num_errors)
+            print "\theader errors corrected: " + str(num_errors)
         else:
-            print "errors corrected: " + str(num_errors)
+            print "\terrors corrected: " + str(num_errors)
 
         decoded_bits = numpy.array(decoded_bits)
 

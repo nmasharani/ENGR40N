@@ -54,8 +54,8 @@ def detect_threshold(demod_samples):
     one = center1
     zero = center2
   
-  print "Threshold for 1: " + str(one)
-  print "Threshold for 0: " + str(zero)
+  print "\tThreshold for 1: " + str(one)
+  print "\tThreshold for 0: " + str(zero)
 
   # insert code to compute thresh
   thresh = (one + zero) / 2.0
