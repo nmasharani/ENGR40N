@@ -246,13 +246,18 @@ class Receiver:
             else:
                 error_loc = -1
                 # figure out which column of H the syndrome corresponds with
-                for j in range(0, k):
+                for j in range(0, n):
                     if numpy.array_equal(HT[j], syndrome):
                         error_loc = j
                         break
                 # only care about errors in the message bits, not in the parity bits
-                if error_loc < 0:
+                if error_loc >= k:
                     decoded_bits.append(coded_bits_split[i][0:k])
+
+                # in this case, there must be more than one bit error
+                elif error_loc < 0:
+                    print "\tERROR Channel Decoding: Unrecoverable bit error (more than one bit error). "
+                    sys.exit(1)
                 
                 # decode by flipping the correct bit
                 else:
