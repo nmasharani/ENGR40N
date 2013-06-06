@@ -68,6 +68,8 @@ class Sink:
     def huffman_decode(self, frequency_map, encoded_bits):
         huffman_tree_root = common_srcsink.build_huffman_tree(frequency_map)
         codeword_map = common_srcsink.build_codeword_map(huffman_tree_root)
+        #for key in codeword_map:
+            #print "key = " + str(key) + " and value = " + str(codeword_map[key])
 
         #builds the decode map by reversing the key value pairs
         decode_map = {} #{"01":0, "00101":6, "0000":7, "00111":8, "0001":9, "00100":12, "00110":13, "1":15}
@@ -171,11 +173,13 @@ class Sink:
                 count = 0
                 intStr = ""
         
-        if len(data) > (1024 * 8):
-            print "Could not recover image due to bit errors."
-        else:
-            img.putdata(data)
-            img.save(filename)
+        if len(data) > (1024):
+            print "Bit errors caused pixel array to be too long."
+            print "Trimming the pixel array to be proper length of 1024."
+            data = data[0:1024]
+    
+        img.putdata(data)
+        img.save(filename)
 
         pass 
 

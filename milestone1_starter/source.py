@@ -86,6 +86,8 @@ class Source:
         # and return a dictionary mapping symbols (4 bit strings as int values) to codeword strings. 
         huffman_tree_root = common.build_huffman_tree(symbol_frequency_dict)
         codeword_map = common.build_codeword_map(huffman_tree_root)
+        #for key in codeword_map:
+            #print "key = " + str(key) + " and value = " + str(codeword_map[key])
 
         #now I compress the orignial bit string by replacing every 4 bit symbol
         # with its corresponding huffman code_word
