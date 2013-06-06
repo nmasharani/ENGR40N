@@ -45,22 +45,6 @@ def lpfilter(samples_in, omega_cut):
     else:
       lpf[n + L] = omega_cut / math.pi
 
-
-  # This is code that works. It's inconvenient because we're not supposed to use numpy.convolve
-  '''
-  sample_len = len(samples_in)
-  lpf_len = len(lpf)
-
-  to_be_filtered = sample_len * [0.0]
-
-  for n in range(0, sample_len):
-    to_be_filtered[n] = samples_in[n] * cmath.exp(complex(0, 2 * omega_cut * n))
-
-  # compute demodulated samples
-
-  demod_samples = numpy.convolve(to_be_filtered, lpf)
-  '''
-
   # compute demodulated samples
 
   demod_samples = convolve(numpy.array(samples_in), numpy.array(lpf), omega_cut)
@@ -127,17 +111,6 @@ def convolve(arr1, arr2, omega_cut):
       cur = numpy.concatenate((cur,zeros),axis=0)
 
     cur = numpy.array(cur[::-1])
-
-
-    '''
-    cursum = 0
-
-    for k in range(0, len_arr2):
-      if n - k >= 0 and n - k < len_arr1:
-        cursum += arr2[k] * arr1[n-k]
-
-    result[n] = cursum
-    '''
 
     #print str(len(cur)) + str(len(arr2))
     result[n] = numpy.sum(numpy.dot(cur, arr2))
