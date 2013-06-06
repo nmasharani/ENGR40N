@@ -171,7 +171,7 @@ class Sink:
                 count = 0
                 intStr = ""
         
-        if len(data) > 1024:
+        if len(data) > (1024 * 8):
             print "Could not recover image due to bit errors."
         else:
             img.putdata(data)
