@@ -86,7 +86,9 @@ class Receiver:
         # when the remaining bits is too short to be the preamble
 
         preamble_samples_length = len(preamble_samples)
-        for i in range (energy_offset, demod_samples_length - preamble_samples_length):
+        #for i in range (energy_offset, demod_samples_length - preamble_samples_length):
+        for i in range(energy_offset, energy_offset + (3 * preamble_samples_length)):
+            pass
             current_range = demod_samples[i:i + preamble_samples_length]
             dot = numpy.dot(current_range, preamble_samples)
             norm = LA.norm(current_range)
